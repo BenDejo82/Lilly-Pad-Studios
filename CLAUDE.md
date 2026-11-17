@@ -1,6 +1,8 @@
 # Lilly Pad Studios — notes for Claude
 
-Lilly Pad Studios (LPS) is a browser-based lighting-control app. Each build is one
+Lilly Pad Studios (LPS) is a browser-based production environment: lighting control,
+projection mapping, MIDI control and stage visualisation working together. It is not
+just a DMX controller. Each build is one
 self-contained HTML file (HTML, CSS and JavaScript inline, mostly minified onto long
 lines). The owner tests on an iPad through GitHub Pages and uploads files through the
 GitHub website.

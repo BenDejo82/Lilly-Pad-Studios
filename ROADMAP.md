@@ -6,6 +6,22 @@ lighting professionals alike.
 > **Easy enough for beginners. Powerful enough for professionals.**
 > You shouldn't have to outgrow Lilly Pad Studios just because you've outgrown being a beginner.
 
+**LPS is not just a DMX controller.** It's one production environment where lighting,
+projection mapping, MIDI control and stage visualisation work together, instead of five
+separate applications. For example: trigger a lighting cue from a MIDI controller that
+changes the stage colours while a mapped visual transitions across the backdrop, all
+from Lilly Pad Studios. Projection mapping is where the project originally started.
+
+The production systems:
+
+- **Lighting control:** fixtures, colours, effects, movement, cues, DMX output.
+- **Projection mapping:** surfaces mapped onto set pieces and backdrops, with visuals that
+  transition in step with the lighting.
+- **MIDI integration:** trigger effects and scenes from the owner's Novation Launchkey or
+  Nektar controller.
+- **Stage visualisation:** preview an entire production before setting up the real
+  equipment.
+
 LPS shouldn't simply imitate an existing lighting console. It should make professional
 lighting control more intuitive without giving up the capabilities professionals need.
 
@@ -27,7 +43,9 @@ One lighting platform, two levels of interaction:
 - Both sit on one **LPS Lighting Engine** (patch, fixture attributes, effects, cues,
   playback, output) and share the same show state. Simple Workspace is an easier way to
   run the professional engine, not a watered-down version of LPS.
-- Around the engine: the Stage Visualizer, real DMX output, and MVR / GDTF import.
+- Around the engine: the Stage Visualizer, projection mapping, MIDI controllers, real DMX
+  output, and MVR / GDTF import, all sharing one show (so a cue can drive lights and
+  mapped visuals together).
 
 Who it is for:
 
@@ -39,6 +57,11 @@ Who it is for:
   definitions, and runs a large production.
 
 ## What's been built
+
+- **Projection mapping (alpha):** the MAPPING tab lets you create several four-cornered
+  surfaces, drag their corners, set a tint, opacity and outline, and import a reference
+  image. It's a planning tool only: no video playback, warping, masking or projector output yet.
+- **MIDI:** not started.
 
 - **A. Foundation:** browser-based HTML/JavaScript prototype; Simple and Professional
   Workspaces on one shared lighting state; Stage Visualizer; fixture selection; colour and
@@ -119,6 +142,11 @@ exit requirement, not because the version number went up.
 3. **Rebuild fixture visuals accurately** (see *Fixture visual spec* below).
 4. **Establish a tested release candidate.** Retest cues, chase groups, Undo/Redo, saved
    projects, floating windows and responsive layouts, then promote it to `index.html`.
+
+**Open question:** an earlier planning chat proposed projection mapping as the *next major
+development area* (built carefully, tested on the iPad, stable versions preserved), while
+the later master plan deferred it until lighting control is dependable. The owner decides
+the order.
 
 Later: the Slayer MVR goes in a **separate experimental workspace**, so importing the
 touring rig can never touch the personal show data. Projection mapping waits until
