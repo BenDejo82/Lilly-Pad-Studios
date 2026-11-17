@@ -170,6 +170,7 @@ Who it is for:
 | v0.3.29 | Fan Move FX animates (opens and closes) | Fan swung inward on iPad |
 | v0.3.30 | Fan spreads outward, by stage position | Passed on iPad |
 | v0.3.31 | Fan Move FX removed (Sweep with Mirror: Pan covers the out-and-in look) | Passed on iPad |
+| v0.3.32 | Console layout cleanup: one design layer (uniform buttons, type, spacing), duplicate colour/FX/deselect/save-cue controls removed, layout tools in a collapsible "Edit layout" section, tidy labels, correct version badge | Browser-tested; iPad check pending |
 
 ## Master roadmap
 
