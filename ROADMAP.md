@@ -34,6 +34,26 @@ lighting control more intuitive without giving up the capabilities professionals
 - **Last build verified on the iPad:** v0.3.25 (floating-window dragging). Kept in `preview/` as a fallback.
 - **Older builds:** `preview/archive/`.
 
+## The big picture: Lighting → Projection Mapping → Unified Sequencer
+
+1. **Lighting:** get the lighting engine, console and fixtures dependable (the master
+   roadmap below).
+2. **Projection Mapping:** developed **separately** (its own test builds) until it's ready,
+   so it can't destabilise the lighting builds.
+3. **Unified Show Sequencer** *(future concept, not implemented)*: build a show on a
+   timeline of three synchronised tracks, e.g. a lighting cue changes the stage colours
+   while a mapped visual transitions across the backdrop.
+
+**Key architectural decision:** Projection Mapping and Lighting must share a common **cue
+and timing system**. Any cue, timing or effect code written for either one should use that
+shared model, so the sequencer later connects two compatible systems instead of forcing
+unrelated pieces together.
+
+**Release rule:** no new stable release until the owner and Claude have reviewed its
+features together.
+
+> One idea. One application. Endless possibilities.
+
 ## Target architecture
 
 One lighting platform, two levels of interaction:
@@ -142,11 +162,6 @@ exit requirement, not because the version number went up.
 3. **Rebuild fixture visuals accurately** (see *Fixture visual spec* below).
 4. **Establish a tested release candidate.** Retest cues, chase groups, Undo/Redo, saved
    projects, floating windows and responsive layouts, then promote it to `index.html`.
-
-**Open question:** an earlier planning chat proposed projection mapping as the *next major
-development area* (built carefully, tested on the iPad, stable versions preserved), while
-the later master plan deferred it until lighting control is dependable. The owner decides
-the order.
 
 Later: the Slayer MVR goes in a **separate experimental workspace**, so importing the
 touring rig can never touch the personal show data. Projection mapping waits until

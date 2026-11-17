@@ -38,6 +38,12 @@ the owner's fixture details and the development standards.
 
 ## Rules
 
+- Development order: **Lighting → Projection Mapping → Unified Sequencer.** Lighting and
+  projection mapping must share one cue and timing system (see `ROADMAP.md`). Develop
+  projection mapping in separate builds until it's ready.
+- Never promote a build to `index.html` (a release) without reviewing its features with
+  the owner first.
+
 - Never change DMX profiles or channel counts just to change graphics. Appearance, control
   attributes and DMX profiles are separate.
 - A visual change must never break an effect that worked. Add a test to
