@@ -52,6 +52,32 @@ unrelated pieces together.
 **Release rule:** no new stable release until the owner and Claude have reviewed its
 features together.
 
+### Development order
+
+1. Lighting console foundation *(current)*
+2. Projection mapping engine *(next)*
+3. Unified sequencer *(after mapping)*
+4. Free / Pro licensing *(before any public commercial release)*
+
+### Technical realities to design for
+
+- **Today's LPS is a browser-based simulator.** It has no verified real-world DMX output and
+  no multi-projector control.
+- **Multiple HDMI / projector outputs need an output architecture**, not a licence switch: a
+  way to address several displays reliably, likely through a desktop application or a
+  companion output service working alongside the browser app.
+- **Licensing must not depend on a live internet connection.** A temporary outage must never
+  interrupt an active show (e.g. licences validated in advance and cached for offline use).
+
+### Free and Pro: one app, different capabilities
+
+- One application, one core engine, one codebase. Free and Pro differ only in which
+  capabilities are unlocked.
+- Design the capability limits into the architecture now, without charging anyone yet.
+- Possible later: educational licences or discounted Pro access for students, schools and
+  community theatres.
+- **Open decision for the owner:** Pro as a one-time purchase or a subscription.
+
 > One idea. One application. Endless possibilities.
 
 ## Target architecture

@@ -41,6 +41,8 @@ the owner's fixture details and the development standards.
 - Development order: **Lighting → Projection Mapping → Unified Sequencer.** Lighting and
   projection mapping must share one cue and timing system (see `ROADMAP.md`). Develop
   projection mapping in separate builds until it's ready.
+- LPS will have Free and Pro tiers in **one** codebase. When adding a feature, keep it easy to
+  gate behind a capability check later; never fork into separate Free and Pro builds.
 - Never promote a build to `index.html` (a release) without reviewing its features with
   the owner first.
 
