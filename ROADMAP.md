@@ -31,7 +31,7 @@ lighting control more intuitive without giving up the capabilities professionals
   been tested successfully, but it is not yet a production-ready lighting console.
 - **Stable build:** `index.html` (currently v0.3.13).
 - **Latest test build:** see the highest version in `preview/`.
-- **Last build verified on the iPad:** v0.3.25 (floating-window dragging). Kept in `preview/` as a fallback.
+- **Last build verified on the iPad:** v0.3.31 (Move FX fixes, Fan removed).
 - **Older builds:** `preview/archive/`.
 
 ## The big picture: Lighting → Projection Mapping → Unified Sequencer
@@ -169,7 +169,7 @@ Who it is for:
 | v0.3.28 | Move FX no longer stopped by the device's Reduce Motion setting | Browser-tested; Fan found static on iPad |
 | v0.3.29 | Fan Move FX animates (opens and closes) | Fan swung inward on iPad |
 | v0.3.30 | Fan spreads outward, by stage position | Passed on iPad |
-| v0.3.31 | Fan Move FX removed (Sweep with Mirror: Pan covers the out-and-in look) | Browser-tested; iPad check pending |
+| v0.3.31 | Fan Move FX removed (Sweep with Mirror: Pan covers the out-and-in look) | Passed on iPad |
 
 ## Master roadmap
 
