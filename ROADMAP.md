@@ -73,7 +73,8 @@ Who it is for:
 | v0.3.27 | Movement visibility and stage-control alignment | Movement still failed on iPad |
 | v0.3.28 | Move FX no longer stopped by the device's Reduce Motion setting | Browser-tested; Fan found static on iPad |
 | v0.3.29 | Fan Move FX animates (opens and closes) | Fan swung inward on iPad |
-| v0.3.30 | Fan spreads outward, by stage position | Browser-tested; iPad check pending |
+| v0.3.30 | Fan spreads outward, by stage position | Passed on iPad |
+| v0.3.31 | Fan Move FX removed (Sweep with Mirror: Pan covers the out-and-in look) | Browser-tested; iPad check pending |
 
 ## Master roadmap
 
@@ -111,7 +112,8 @@ exit requirement, not because the version number went up.
 ## Current sprint
 
 1. **Resolve Move FX completely.** Verify on the real iPad: selected-mover targeting,
-   Circle / Sweep / Figure Eight / Fan movement, and beam visualisation.
+   Circle / Sweep / Figure Eight movement, and beam visualisation. (Fan was removed in
+   v0.3.31; a static "spread positions" tool may return in Stage 4 with presets.)
 2. **Finish the console layout cleanup.** Remove overlaps, unnecessary bubble buttons and
    duplicate controls; fix inconsistent alignment.
 3. **Rebuild fixture visuals accurately** (see *Fixture visual spec* below).

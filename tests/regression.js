@@ -61,7 +61,7 @@ async function testBuild(browser, file) {
 
   // 2. Every Move FX moves the beams, with the device's Reduce Motion setting on and off.
   for (const reducedMotion of ['reduce', 'no-preference']) {
-    for (const mode of ['circle', 'sweep', 'eight', 'fan']) {
+    for (const mode of ['circle', 'sweep', 'eight']) {
       const { context, page, errors } = await newPage(browser, file, 'iPad landscape', reducedMotion);
       await click(page, '[data-quick-group="movers"]');
       await click(page, `[data-move-fx="${mode}"]`);
@@ -76,23 +76,11 @@ async function testBuild(browser, file) {
     }
   }
 
-  // 3. Fan spreads outward: the left mover aims left (positive angle), the right mover aims right.
+  // 3. Fan was removed in v0.3.31 (Sweep with Mirror: Pan covers it); its button must stay gone.
   {
-    const { context, page } = await newPage(browser, file, 'iPad landscape');
-    await click(page, '[data-quick-group="movers"]');
-    await click(page, '[data-move-fx="fan"]');
-    let widest = [0, 0];
-    for (let k = 0; k < 20; k++) {
-      const angles = await moverAngles(page);
-      if (angles.length >= 2 && Math.abs(angles[0]) > Math.abs(widest[0])) widest = angles;
-      await page.waitForTimeout(150);
-    }
-    const order = await page.evaluate(() =>
-      [...document.querySelectorAll('.fixture.multi-selected')]
-        .map(g => Number((g.getAttribute('transform').match(/translate\((-?[\d.]+)/) || [])[1])));
-    const leftFirst = order[0] < order[1];
-    const outward = leftFirst ? widest[0] > 10 && widest[1] < -10 : widest[0] < -10 && widest[1] > 10;
-    check('Move FX fan spreads outward, not inward', outward, `widest angles ${widest.map(v => v.toFixed(1))}`);
+    const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
+    const fanButton = await page.evaluate(() => !!document.querySelector('[data-move-fx="fan"]'));
+    check('Fan Move FX button is removed', !fanButton);
     await context.close();
   }
 
