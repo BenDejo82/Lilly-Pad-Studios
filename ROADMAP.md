@@ -1,0 +1,180 @@
+# Lilly Pad Studios — Roadmap
+
+Lilly Pad Studios (LPS) is a lighting-control app that should serve beginners and
+lighting professionals alike.
+
+> **Easy enough for beginners. Powerful enough for professionals.**
+> You shouldn't have to outgrow Lilly Pad Studios just because you've outgrown being a beginner.
+
+LPS shouldn't simply imitate an existing lighting console. It should make professional
+lighting control more intuitive without giving up the capabilities professionals need.
+
+## Where we stand
+
+- **Phase:** prototype, in functional testing and UI refinement. Several systems have
+  been tested successfully, but it is not yet a production-ready lighting console.
+- **Stable build:** `index.html` (currently v0.3.13).
+- **Latest test build:** see the highest version in `preview/`.
+
+## Target architecture
+
+One lighting platform, two levels of interaction:
+
+- **Simple Workspace:** fast setup, touch-first programming, quick colours and FX.
+- **Professional Workspace:** advanced programming, groups, cue stacks, detailed fixture control.
+- Both sit on one **LPS Lighting Engine** (patch, fixture attributes, effects, cues,
+  playback, output) and share the same show state. Simple Workspace is an easier way to
+  run the professional engine, not a watered-down version of LPS.
+- Around the engine: the Stage Visualizer, real DMX output, and MVR / GDTF import.
+
+Who it is for:
+
+- **Beginner:** adds fixtures, picks colours, builds a chase and runs a show without
+  learning a complicated console.
+- **Working operator:** groups, palettes, precise movement, effects, cue lists, playback
+  and reliable DMX output for weddings, bands and corporate events.
+- **Touring professional:** imports an MVR stage design, works with verified GDTF fixture
+  definitions, and runs a large production.
+
+## What's been built
+
+- **A. Foundation:** browser-based HTML/JavaScript prototype; Simple and Professional
+  Workspaces on one shared lighting state; Stage Visualizer; fixture selection; colour and
+  intensity; patch and programmable looks.
+- **B. Programming and effects:** Static, Pulse, Chase and Rainbow effects; chase colours
+  (Fixture Colour, White, Custom); multi-fixture targeting; multiple chase groups;
+  moving-head effects and beam-direction visualisation; speed and intensity controls.
+- **C. Cues and show management:** STC (Save to Cue), cue recall, Undo/Redo, Save Project
+  (browser storage), Export/Import JSON, project reopening.
+- **D. Interface and workflow:** Quick Colour and FX near the visualizer, grouped project
+  actions, simpler buttons, floating Stage Visualizer. A professional interface needs
+  symmetry, consistent spacing and deliberate control placement, not just attractive
+  colours and effects.
+- **E. Real-world fixture research:** the personal rig (below) and the *Slayer 2026 LA
+  Support* MVR file as a professional touring reference.
+
+## Version history (recent)
+
+| Version | Milestone | Result |
+|---|---|---|
+| v0.3.16 | Earlier stable prototype checkpoint | Previous baseline |
+| v0.3.17 | Simple Workspace prototype | Foundation for further changes |
+| v0.3.18 | Visible FX controls, custom chase colours, STC | Passed functional testing |
+| v0.3.19 | Undo/Redo correction | Passed |
+| v0.3.20 | Chase colour sync between fixture groups | Passed |
+| v0.3.21 | Single-tap history correction | Passed; project reopening confirmed |
+| v0.3.22 | Grouped project controls, Quick Colour and FX | Working in initial testing |
+| v0.3.23 | Experimental vibrant fixture graphics | Rejected visually |
+| v0.3.24 | Visualizer docking and scroll correction | Insufficient |
+| v0.3.25 | Independent floating-window dragging | Passed on iPad |
+| v0.3.26 | Cleaner, text-first console UI | Move FX regression reported |
+| v0.3.27 | Movement visibility and stage-control alignment | Movement still failed on iPad |
+| v0.3.28 | Move FX no longer stopped by the device's Reduce Motion setting | Browser-tested; Fan found static on iPad |
+| v0.3.29 | Fan Move FX animates (opens and closes) | Fan swung inward on iPad |
+| v0.3.30 | Fan spreads outward, by stage position | Browser-tested; iPad check pending |
+
+## Master roadmap
+
+Stages are development gates, not promised release dates. Move on when a stage meets its
+exit requirement, not because the version number went up.
+
+1. **Stabilise the lighting engine** *(current)*. Resolve Move FX, verify cue
+   reliability, confirm independent fixture selection, build repeatable tests for every
+   important control.
+   *Exit:* core effects, history, project loading and visualizer movement pass repeatable
+   tests on iPad and desktop.
+2. **Complete the professional UI foundation.** One consistent design system:
+   typography, spacing, responsive grids, compact controls, docking, coherent navigation,
+   touch-friendly selection. Stage Visualizer and programming tools easy to use together.
+   *Exit:* common programming tasks need no unnecessary tab switching or overlapping controls.
+3. **Realistic fixtures and visualisation.** Replace generic fixture icons with accurate,
+   efficient visuals based on real geometry, LED layouts, mounting orientation and optics.
+   Test with the personal rig first, then the Slayer MVR as a larger benchmark.
+   *Exit:* fixtures are recognisable, selection is clear, beams animate correctly, and
+   large layouts stay responsive.
+4. **Professional programming.** Fixture attributes, palettes, groups, presets, timing,
+   advanced effects, cue stacks, reliable playback, live-show safeguards.
+   *Exit:* a complete rehearsal show can be programmed, saved, reopened and played back
+   predictably.
+5. **Hardware output and interoperability.** Real DMX output through supported hardware
+   and protocols, starting with one carefully tested path. GDTF fixture definitions and
+   MVR import, validating addresses, modes, universes and geometry.
+   *Exit:* verified output to real fixtures, recoverable connection failures, dependable
+   imported-show behaviour.
+6. **Expanded show-production platform.** Projection mapping, video sync, timecode, MIDI
+   control surfaces, show automation.
+   *Exit:* these share a stable show timeline and control architecture without
+   compromising lighting reliability.
+
+## Current sprint
+
+1. **Resolve Move FX completely.** Verify on the real iPad: selected-mover targeting,
+   Circle / Sweep / Figure Eight / Fan movement, and beam visualisation.
+2. **Finish the console layout cleanup.** Remove overlaps, unnecessary bubble buttons and
+   duplicate controls; fix inconsistent alignment.
+3. **Rebuild fixture visuals accurately** (see *Fixture visual spec* below).
+4. **Establish a tested release candidate.** Retest cues, chase groups, Undo/Redo, saved
+   projects, floating windows and responsive layouts, then promote it to `index.html`.
+
+Later: the Slayer MVR goes in a **separate experimental workspace**, so importing the
+touring rig can never touch the personal show data. Projection mapping waits until
+lighting control is dependable.
+
+## Development standards
+
+| Area | Standard |
+|---|---|
+| Version control | Keep a known-good build (`index.html`) and separate test builds (`preview/`). |
+| Regression testing | Re-run `tests/regression.js` after every change. A visual change must never break an effect that worked. |
+| UI development | Use one consistent design system, not isolated CSS tweaks. |
+| Fixture definitions | Keep appearance, control attributes and DMX profiles separate. Never change a DMX profile just to update graphics. |
+| Performance | Test the small personal rig and professional-scale rigs. |
+| Compatibility | Test desktop and iPad, in both orientations. |
+| Project integrity | Preserve user data, validate imports, support portable backups. |
+| Release approval | Promote a build to `index.html` only after the required tests pass and it's been checked on the iPad. |
+
+Longer term: move from one large HTML file to a modular app (rendering, effects, project
+management and output as separate modules).
+
+## Personal rig (small-production reference)
+
+Dimensions and DMX modes vary by listing and model revision; verify against the actual
+units before changing any LPS profile.
+
+| Fixture | Researched facts | How it should look in the visualizer |
+|---|---|---|
+| **OPPSK 36W RGB PAR** | 36 individual LEDs; about 7.3 × 6.1 × 3.1 in; 25° beam | Round face with 36 small LED lenses, simple housing |
+| **Betopper LM30A** | Spider-style, eight 3W RGBW LEDs, independently moving sections; about 11 × 6.3 × 4.9 in | Two narrow LED bars of four lenses each, mounted upright. Not a round PAR shape. |
+| **Betopper LF4808** | Rectangular matrix strobe, 768 RGB + 112 white LEDs; about 17.5 × 9.4 × 3.2 in; 4-, 15- and 152-channel modes | Wide rectangular panel with a simplified LED matrix, centred on the truss |
+| **DJXFLI 90W moving head** | About 8.7 × 7.5 × 11 in; pan/tilt; narrow beam. Manual lists 12 DMX channels but the LPS patch uses 13: **verify the exact variant.** | Recognisable base, yoke and head, beam leaving the lens |
+
+### Fixture visual spec
+
+- A fixture looks like the real unit even when it's off. When on, its lenses light up and
+  the beam shows the programmed colour.
+- Selection adds one restrained highlight and doesn't change the fixture's colour. No
+  stacked rings.
+- Keep the physical truss layout, including the upright LM30As and the centred LF4808.
+
+## Professional reference: Slayer 2026 LA Support MVR
+
+114 fixtures across six types: Robe Robin iForte (30), Robe Robin iSpiider (23), Chauvet
+Color STRIKE M (22), Chauvet STRIKE Array 4 (20), Chauvet STRIKE Array 2 (15), MDG The One
+Touring (4). The MVR archive holds 288 GLB geometry files, fixture positions, orientation
+matrices, identifiers and addressing; one embedded GDTF (the MDG fixture), with the others
+referenced by name.
+
+Use it for: (1) realistic fixture appearance, (2) importing the layout into a separate
+read-only preview, (3) testing performance and navigation with a 114-fixture rig. It is a
+reference project and must never overwrite the personal rig or its patch.
+
+## The goal
+
+Take LPS to a show: open it on a laptop or tablet, load the show or import the venue's rig,
+verify fixtures, addresses and universes, program colours, movement, effects and cues,
+preview it realistically, connect supported output hardware, run the show, save, and move
+on to the next venue.
+
+LPS should be a coherent system where every feature works together, every control has a
+clear purpose, and the interface feels natural to both a first-time user and an
+experienced lighting designer.
