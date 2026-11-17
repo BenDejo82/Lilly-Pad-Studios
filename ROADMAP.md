@@ -15,6 +15,8 @@ lighting control more intuitive without giving up the capabilities professionals
   been tested successfully, but it is not yet a production-ready lighting console.
 - **Stable build:** `index.html` (currently v0.3.13).
 - **Latest test build:** see the highest version in `preview/`.
+- **Last build verified on the iPad:** v0.3.25 (floating-window dragging). Kept in `preview/` as a fallback.
+- **Older builds:** `preview/archive/`.
 
 ## Target architecture
 

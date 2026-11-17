@@ -13,7 +13,9 @@ the owner's fixture details and the development standards.
 - `index.html`: the **stable** build. Only replace it when the owner says a preview build
   passed on the iPad and the tests pass.
 - `preview/`: numbered test builds, e.g. `Lilly_Pad_Studios_v0.3.30_Fan_Outward_FIX_TEST.html`.
-  The highest version is the current working build.
+  The highest version is the current working build. Keep only the last few builds here,
+  plus the last build verified on the iPad; move older ones to `preview/archive/`.
+- `preview/archive/`: older test builds, kept for reference. Don't build on these.
 - `tests/regression.js`: browser tests for core features.
 
 ## How to make a change
