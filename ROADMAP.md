@@ -57,7 +57,33 @@ features together.
 1. Lighting console foundation *(current)*
 2. Projection mapping engine *(next)*
 3. Unified sequencer *(after mapping)*
-4. Free / Pro licensing *(before any public commercial release)*
+4. **Independent user testing** *(before charging anyone)*
+5. Free / Pro licensing *(before any public commercial release)*
+
+### Independent user testing
+
+After projection mapping and the sequencer, put LPS in the hands of 10–20 independent
+operators who weren't involved in building it. Ask them to complete real tasks **without
+coaching**:
+
+- patch fixtures
+- create a chase
+- map a surface
+- synchronise a cue
+- save a show
+- recover from a mistake
+
+Measure how long each task takes, where they struggle, and whether they'd choose LPS over
+their existing tools. That shows whether the biggest advantage is simplicity, integration,
+pricing, or something not yet recognised.
+
+### Positioning
+
+The market won't reward LPS merely for combining features that already exist. It can stand
+out by making lighting, mapping and sequencing **dramatically easier to use together**,
+especially for independent musicians, small production companies, and creators who don't
+have a dedicated lighting or video technician. Judge new features by that: does it make the
+whole show easier to build and run?
 
 ### Technical realities to design for
 
