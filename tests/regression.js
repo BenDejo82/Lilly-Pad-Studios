@@ -107,7 +107,23 @@ async function testBuild(browser, file) {
     await context.close();
   }
 
-  // 5. Colour effects change fixture colours over time.
+  // 5. Layout order (v0.3.34): the stage view comes straight after the Stage Visualizer bar,
+  //    and the view controls sit at the bottom of the panel.
+  {
+    const { context, page } = await newPage(browser, file, 'iPad landscape');
+    const order = await page.evaluate(() => {
+      const kids = [...document.querySelector('#lightingStagePanel .lps-stage-scroll').children];
+      const first = kids.find(k => k.offsetParent !== null);
+      const controls = document.querySelector('.lps-view-controls');
+      return { stageFirst: first && first.id === 'stage', controlsLast: !!controls && kids[kids.length - 1] === controls,
+        zoomInside: !!controls && !!controls.querySelector('#stageZoom') };
+    });
+    check('Layout: stage view sits directly under the Stage Visualizer bar', order.stageFirst);
+    check('Layout: View & Layout controls are at the bottom', order.controlsLast && order.zoomInside);
+    await context.close();
+  }
+
+  // 6. Colour effects change fixture colours over time.
   for (const fx of ['chase', 'rainbow']) {
     const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
     await click(page, '[data-quick-group="pars"]');
