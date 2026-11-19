@@ -22,6 +22,10 @@ the owner's fixture details and the development standards.
 
 ## How to make a change
 
+**Confirm with the owner before creating any new build.** Describe what you plan to change
+(and what you've found, if it's a bug) and wait for a go-ahead before making the new
+`preview/` file or pushing it. This applies to every new version, including small fixes.
+
 1. Copy the latest `preview/` build to a new file with the next version number and a short
    description, e.g. `Lilly_Pad_Studios_v0.3.31_<What_Changed>_TEST.html`. Never edit an
    older build in place: the owner may have it open or be comparing against it.
