@@ -40,6 +40,16 @@ the owner's fixture details and the development standards.
 6. Give the owner the iPad link:
    `https://bendejo82.github.io/Lilly-Pad-Studios/preview/<file name>`
 
+## Code conventions
+
+- All styling lives in the single `<style id="lps-styles">` block. Change or add rules there;
+  never add another `<style>` block or patch earlier rules with extra `!important` layers.
+- Never use `alert()`: it pauses the whole app (and running effects) on the iPad. Use
+  `lpsNotify('message')` for in-app notices. The only allowed prompt is the import confirmation.
+- Fold-out sections are defined in `SECTIONS` by a marker element, never by position.
+- Before publishing, also run the code checker (ESLint, no-undef / no-unused-vars) and compare
+  screenshots of every screen with the previous build when a change should not alter the look.
+
 ## Rules
 
 - Development order: **Lighting → Projection Mapping → Unified Sequencer.** Lighting and

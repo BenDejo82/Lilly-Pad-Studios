@@ -3,7 +3,7 @@
 // core features still work, so a visual change can't quietly break an effect.
 //
 // Usage:   node tests/regression.js <build.html> [more builds...]
-// Example: node tests/regression.js preview/Lilly_Pad_Studios_v0.3.30_Fan_Outward_FIX_TEST.html
+// Example: node tests/regression.js preview/Lilly_Pad_Studios_v0.3.35_Code_Cleanup_TEST.html
 // Needs:   Playwright (npm install playwright, then npx playwright install chromium)
 //
 // Exit code is 0 when every check passes, 1 otherwise.
@@ -133,6 +133,131 @@ async function testBuild(browser, file) {
     let b = a;
     for (let k = 0; k < 6 && b === a; k++) { await page.waitForTimeout(200); b = await fixtureColours(page); }
     check(`Colour FX ${fx} changes the stage`, a !== b && errors.length === 0);
+    await context.close();
+  }
+
+  // 7. Show workflow with real finger taps: colours, Undo/Redo, cues and GO, save and reopen.
+  {
+    const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
+    const dialogs = [];
+    page.on('dialog', d => { dialogs.push(d.message()); d.dismiss(); });
+    // The stage redraws on the next animation frame, so give it a moment before reading it.
+    const look = async () => { await page.waitForTimeout(150); return page.evaluate(() =>
+      [...document.querySelectorAll('.fixture .beam-guide')].map(x => x.getAttribute('fill')).join('|')); };
+    const swatch = name => page.locator('#swatches .swatch', { hasText: name }).tap();
+    const base = await look();
+    await page.locator('[data-quick-group="pars"]').tap();
+    await swatch('RED'); const red = await look();
+    await swatch('BLUE'); const blue = await look();
+    check('Workflow: colour taps change the stage', red !== base && blue !== red);
+    await page.locator('#lpsUndo').tap(); const u1 = await look();
+    await page.locator('#lpsUndo').tap(); const u2 = await look();
+    await page.locator('#lpsRedo').tap(); const r1 = await look();
+    check('Workflow: Undo steps back through colour changes', u1 === red && u2 === base);
+    check('Workflow: Redo re-applies an undone change', r1 === red);
+
+    await page.locator('#lpsSTC').tap();
+    await swatch('BLUE');
+    await page.locator('#lpsSTC').tap();
+    const cueCount = () => page.evaluate(() => document.querySelectorAll('#cueList > *').length);
+    check('Workflow: Save Cue captures cues', (await cueCount()) === 2, `${await cueCount()} cues`);
+    await click(page, '#lpsWorkspaceToggle');
+    await click(page, '.tabs [data-tab="show"]');
+    await click(page, '#goCue'); const g1 = await look();
+    await click(page, '#goCue'); const g2 = await look();
+    check('Workflow: GO steps between cues', new Set([g1, g2]).size === 2 && [g1, g2].includes(red) && [g1, g2].includes(blue));
+
+    await page.locator('#lpsSaveShow').tap();
+    const saved = await look();
+    await page.reload(); await page.waitForTimeout(800);
+    check('Workflow: reopening restores the stage', (await look()) === saved);
+    check('Workflow: reopening restores the cues', (await cueCount()) === 2);
+    check('Workflow: no pop-up dialogs interrupt the show', dialogs.length === 0, dialogs.join(' / '));
+    check('Workflow: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
+    await context.close();
+  }
+
+  // 8. Export JSON produces a valid show file, and Import JSON brings it back.
+  {
+    const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
+    page.on('dialog', d => d.accept()); // the import confirmation is the one intended prompt
+    // The stage redraws on the next animation frame, so give it a moment before reading it.
+    const look = async () => { await page.waitForTimeout(150); return page.evaluate(() =>
+      [...document.querySelectorAll('.fixture .beam-guide')].map(x => x.getAttribute('fill')).join('|')); };
+    await page.locator('[data-quick-group="pars"]').tap();
+    await page.locator('#swatches .swatch', { hasText: 'RED' }).tap();
+    const exported = await look();
+    await page.evaluate(() => { document.getElementById('lpsFileMenu').open = true; });
+    const [download] = await Promise.all([
+      page.waitForEvent('download', { timeout: 5000 }).catch(() => null),
+      click(page, '#lpsExportShow')]);
+    let json = null;
+    try { json = JSON.parse(require('fs').readFileSync(await download.path(), 'utf8')); } catch (e) { /* reported below */ }
+    check('Files: Export JSON downloads a valid show file',
+      !!json && Array.isArray(json.fixtures) && Array.isArray(json.cues));
+    if (json) {
+      await page.locator('#swatches .swatch', { hasText: 'GREEN' }).tap();
+      const [chooser] = await Promise.all([
+        page.waitForEvent('filechooser', { timeout: 5000 }).catch(() => null),
+        click(page, '#lpsImportShow')]);
+      if (chooser) { await chooser.setFiles(await download.path()); await page.waitForTimeout(800); }
+      check('Files: Import JSON restores the exported show', !!chooser && (await look()) === exported);
+    }
+    check('Files: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
+    await context.close();
+  }
+
+  // 9. A corrupted save in browser storage must not stop the app from starting.
+  {
+    const { context, page } = await newPage(browser, file, 'iPad landscape');
+    await page.evaluate(() => {
+      for (const k of Object.keys(localStorage)) if (/lps|lilly/i.test(k)) localStorage.setItem(k, '{broken');
+      localStorage.setItem('lilly-pad-studios-v03', '{broken');
+    });
+    const errors = [];
+    page.on('pageerror', e => errors.push(e.message));
+    await page.reload(); await page.waitForTimeout(800);
+    const fixtures = await page.evaluate(() => document.querySelectorAll('.fixture').length);
+    check('Files: starts cleanly when saved data is corrupted', errors.length === 0 && fixtures > 0, errors.join(' / '));
+    await context.close();
+  }
+
+  // 10. The docked Stage Visualizer bar scrolls with the page instead of sticking to the top.
+  {
+    const { context, page } = await newPage(browser, file, 'iPad landscape');
+    await page.evaluate(() => scrollTo(0, 600)); await page.waitForTimeout(150);
+    const top = await page.evaluate(() => document.getElementById('stageHeading').getBoundingClientRect().top);
+    check('Layout: docked Stage Visualizer bar scrolls away with the page', top < -10, `bar top ${Math.round(top)}px`);
+    await context.close();
+  }
+
+  // 11. Tap every visible control on every tab, in both workspaces: nothing may throw an error
+  //     or open a blocking pop-up.
+  {
+    const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
+    const dialogs = [];
+    page.on('dialog', d => { dialogs.push(d.message()); d.dismiss(); });
+    let tapped = 0;
+    const sweep = async () => {
+      await page.evaluate(() => document.querySelectorAll('details').forEach(d => { d.open = true; }));
+      tapped += await page.evaluate(() => {
+        const skip = /^(lpsWorkspaceToggle|detachVisualizer|restoreVisualizer|expandStage|lpsLoadShow|lpsImportShow|importProject|lpsRecovery|downloadRecovery|exportProject|lpsExportShow|mapExport)$/;
+        const controls = [...document.querySelectorAll('button')]
+          .filter(b => b.offsetParent !== null && !b.closest('.tabs') && !skip.test(b.id));
+        controls.forEach(b => b.click());
+        return controls.length;
+      });
+      await page.waitForTimeout(150);
+    };
+    await sweep();
+    await click(page, '#lpsWorkspaceToggle');
+    for (const tab of ['live', 'program', 'fx', 'show', 'mapping', 'patch']) {
+      await click(page, `.tabs [data-tab="${tab}"]`);
+      await sweep();
+    }
+    check('Sweep: every control can be tapped without errors', errors.length === 0 && tapped > 150,
+      errors.length ? errors.slice(0, 2).join(' / ') : `${tapped} taps`);
+    check('Sweep: no blocking pop-ups (messages appear in the app instead)', dialogs.length === 0, dialogs.slice(0, 3).join(' / '));
     await context.close();
   }
 

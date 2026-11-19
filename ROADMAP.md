@@ -173,6 +173,7 @@ Who it is for:
 | v0.3.32 | Console layout cleanup: one design layer (uniform buttons, type, spacing), duplicate colour/FX/deselect/save-cue controls removed, layout tools in a collapsible "Edit layout" section, tidy labels, correct version badge | Browser-tested; iPad check pending |
 | v0.3.33 | FX ENGINE and Pro LIVE fold-out sections fixed: panels were sorted by position and had shifted one section down (Flash FX was empty, its settings sat in Effect Programming). Now sorted by what each panel contains | Browser-tested; iPad check pending |
 | v0.3.34 | Stage view directly under the Stage Visualizer bar; zoom, beam guides, view and Edit layout grouped as "View & Layout" at the bottom of the panel | Browser-tested; iPad check pending |
+| v0.3.35 | Code cleanup: docked Stage Visualizer bar no longer sticks to the top; 22 blocking pop-ups replaced with in-app notices; Undo also records keyboard actions; all fold-out sections placed by content; 14 style blocks merged into one with dead and overridden rules removed (screens pixel-identical); hidden duplicate Quick Color code and unused values removed; test suite expanded to 36 checks | Browser-tested; iPad check pending |
 
 ## Master roadmap
 
