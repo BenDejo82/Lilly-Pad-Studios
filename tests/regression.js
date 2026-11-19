@@ -84,7 +84,30 @@ async function testBuild(browser, file) {
     await context.close();
   }
 
-  // 4. Colour effects change fixture colours over time.
+  // 4. Fold-out sections hold the right panels. In v0.3.32 and earlier every FX ENGINE section
+  //    was shifted one down (Flash FX was empty) because panels were placed by position.
+  {
+    const { context, page } = await newPage(browser, file, 'iPad landscape');
+    const sections = await page.evaluate(() => {
+      const out = {};
+      document.querySelectorAll('details.lps-accordion').forEach(d => {
+        out[d.querySelector('summary').textContent.trim()] = d.querySelector('.lps-accordion-body');
+      });
+      const has = (title, sel) => !!out[title]?.querySelector(sel);
+      return {
+        'Flash FX holds the flash controls': has('Flash FX', '.fx-flash-controls'),
+        'Movement FX holds the Move FX panel': has('Movement FX', '#moveFxBox'),
+        'Effect Library holds the effect parameters': has('Effect Library & Parameters', '#fxContextPanel'),
+        'Effect Programming holds the designer status': has('Effect Programming', '#fxDesignerStatus'),
+        'Channel Controls holds the Master Dimmer': has('Channel Controls & Dimmer', '#dimmer'),
+        'Strobe & Shutter holds the strobe pattern': has('Strobe & Shutter', '.strobe-parameters'),
+      };
+    });
+    for (const [name, ok] of Object.entries(sections)) check(`Section: ${name}`, ok);
+    await context.close();
+  }
+
+  // 5. Colour effects change fixture colours over time.
   for (const fx of ['chase', 'rainbow']) {
     const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
     await click(page, '[data-quick-group="pars"]');
