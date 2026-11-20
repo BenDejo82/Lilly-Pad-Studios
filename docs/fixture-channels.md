@@ -53,6 +53,34 @@ Channels 1–4 confirmed from the full manual table. In DMX mode with no signal,
 4 Master dimmer, 5 Strobe, 6–9 R/G/B/W, 10 Color auto, 11 Motor auto, 12 Built-in programs,
 13 Reset. Everything from channel 3 on is shifted compared with the card.
 
+### Specs and front-panel menu (from the manual)
+
+- Product: LED Beam 90W moving head. Control: DMX512, **13 channels only**.
+- Working modes: DMX512, master/slave, self-propelled (auto), voice (sound) control.
+- Dimming 0–100% smooth; strobe up to 25 flashes per second.
+- Power listed as AC 220 V / 50 Hz. ⚠️ Check the label on the actual units before plugging into
+  120 V / 60 Hz mains; many units like this are 100–240 V, but the listing doesn't say so.
+- Look (for graphics): beam head with a single round front lens, held in a yoke on a square base
+  with a 4-digit display.
+
+| Menu | What it does |
+|---|---|
+| Addr | DMX start address A001–A512 |
+| CHnd | Channel mode (13CH) |
+| SLnd | Operation mode: DMX / self-propelled / voice control |
+| Pan | YES/NO: reverse the X (pan) motor direction |
+| Tilt | YES/NO: reverse the Y (tilt) motor direction |
+| SEne | Sound sensitivity 0–100 |
+| LED | Display always on (ON/OFF) |
+| DISP | Flip the display (YES/NO) |
+| Ver | Software version (V100) |
+| Faet | Restore factory settings (YES/NO) |
+| Fine-tuning | Hold MENU 5 s: Pan and Tilt fine adjustment −127…127 |
+
+**Note for the app:** because Pan and Tilt can be reversed on the fixture itself, the app's
+future DMX output should offer per-fixture pan/tilt invert too, so the two movers can mirror
+each other however they're hung.
+
 ---
 
 ## Betopper LM30A — 13-channel mode ⚠️ (7-channel mode also listed)
