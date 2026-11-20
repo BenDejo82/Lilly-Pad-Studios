@@ -315,7 +315,7 @@ async function testBuild(browser, file) {
   }
 
   // 14. Truss numbering (v0.3.37): numbered stage left to stage right, so from the audience
-  //     (screen) the truss reads PAR 6 … PAR 1 left to right; PAR 7 is the SR boom, PAR 8 the SL boom.
+  //     (screen) the truss reads PAR 6 … PAR 1 left to right; PAR 7 is the SR floor uplight, PAR 8 the SL one.
   {
     const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
     const layout = () => page.evaluate(() => [...document.querySelectorAll('.fixture')].map(g => {
@@ -327,10 +327,10 @@ async function testBuild(browser, file) {
     let l = await layout();
     check('Numbering: truss runs stage left to stage right', truss(l) === expectedTruss, truss(l));
     const boom = n => l.find(f => f.name === n);
-    check('Numbering: PAR 7 on the SR boom (screen left), PAR 8 on the SL boom', boom('PAR 7').x < 100 && boom('PAR 8').x > 540);
-    check('Numbering: Stage Right / Stage Left and boom labels are shown',
+    check('Numbering: PAR 7 on the SR floor position (screen left), PAR 8 on the SL floor position', boom('PAR 7').x < 100 && boom('PAR 8').x > 540);
+    check('Numbering: Stage Right / Stage Left and floor-position labels are shown',
       await page.evaluate(() => [...document.querySelectorAll('#stageSvg text')].map(t => t.textContent).join('|'))
-        .then(t => /STAGE RIGHT/.test(t) && /STAGE LEFT/.test(t) && /SR BOOM/.test(t) && /SL BOOM/.test(t)));
+        .then(t => /STAGE RIGHT/.test(t) && /STAGE LEFT/.test(t) && /SR FLOOR/.test(t) && /SL FLOOR/.test(t)));
     check('Numbering: DMX addresses unchanged',
       await page.evaluate(() => ['PAR 1 DMX 1', 'PAR 6 DMX 36', 'MOVER 1 DMX 57', 'LM30A 2 DMX 111', 'LF4808 DMX 83']
         .every(a => !!document.querySelector(`.fixture[aria-label="${a}"]`))));
@@ -363,7 +363,7 @@ async function testBuild(browser, file) {
   }
 
   // 15. Alignment (v0.3.38): even truss spacing, one line for labels and palettes, every beam and
-  //     palette centred under its fixture, booms directly under the truss legs.
+  //     palette centred under its fixture, floor PARs directly under the truss legs.
   for (const detailed of [false, true]) {
     const { context, page } = await newPage(browser, file, 'iPad landscape');
     if (detailed) { await click(page, '#stageMode'); await page.waitForTimeout(300); }
@@ -392,8 +392,58 @@ async function testBuild(browser, file) {
       check('Alignment: labels clear of palette boxes', m.fx.every(f => f.label.bottom <= f.pal.top));
     }
     const booms = m.fx.filter(f => f.y !== 78).sort((a, b) => a.x - b.x);
-    check(`Alignment: booms hang directly under the truss legs · ${mode}`,
+    check(`Alignment: floor PARs sit directly under the truss legs · ${mode}`,
       booms.length === 2 && Math.abs(booms[0].x - m.legs[0][0]) < 0.6 && Math.abs(booms[1].x - m.legs[1][0]) < 0.6, JSON.stringify(m.legs));
+    await context.close();
+  }
+
+  // 16. 3D visualizer (v0.3.39): opens on request, mirrors the rig and the show, and closes back to 2D.
+  {
+    const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
+    const toggle = page.locator('#stage3dToggle');
+    check('3D: the stage opens in 2D by default',
+      await page.evaluate(() => !document.getElementById('stage').hidden && (!window.LPS3D || !window.LPS3D.isOn())));
+    await toggle.tap();
+    await page.waitForTimeout(1500);
+    const snap = () => page.evaluate(() => window.LPS3D.snapshot());
+    let units = await snap();
+    check('3D: opens with all 13 fixtures and hides the 2D view',
+      units.length === 13 && await page.evaluate(() => window.LPS3D.isOn() && document.getElementById('stage').hidden
+        && !!document.querySelector('#stage3d canvas')), `${units.length} fixtures`);
+    const truss = units.filter(u => !u.onFloor).sort((a, b) => a.x - b.x).map(u => u.name).join(' · ');
+    check('3D: truss order matches the rig (PAR 1 at stage left)',
+      truss === 'PAR 6 · MOVER 2 · LM30A 2 · PAR 5 · PAR 4 · LF4808 · PAR 3 · PAR 2 · LM30A 1 · MOVER 1 · PAR 1', truss);
+    const byName = n => units.find(u => u.name === n);
+    check('3D: PAR 7 and PAR 8 are floor uplights at stage right and stage left',
+      byName('PAR 7').onFloor && byName('PAR 8').onFloor && byName('PAR 7').x < 0 && byName('PAR 8').x > 0);
+
+    await page.locator('[data-quick-group="pars"]').tap();
+    await page.locator('#swatches .swatch', { hasText: 'RED' }).tap();
+    await page.waitForTimeout(300);
+    units = await snap();
+    check('3D: beams follow the programmed colour', units.find(u => u.name === 'PAR 1').beam === '#ff0000'
+      && units.find(u => u.name === 'PAR 1').beamOpacity > 0.1, JSON.stringify(units.find(u => u.name === 'PAR 1')));
+
+    await page.locator('[data-quick-group="movers"]').tap();
+    await click(page, '[data-move-fx="circle"]');
+    await page.waitForTimeout(300);
+    const pan1 = (await snap()).find(u => u.name === 'MOVER 1').pan;
+    await page.waitForTimeout(900);
+    const pan2 = (await snap()).find(u => u.name === 'MOVER 1').pan;
+    check('3D: Move FX turns the mover heads', Math.abs(pan1 - pan2) > 0.02, `${pan1} → ${pan2}`);
+
+    await page.locator('#blackout').tap();
+    await page.waitForTimeout(300);
+    check('3D: Blackout turns every beam off', (await snap()).every(u => u.beamOpacity === 0));
+    await page.locator('#blackout').tap();
+
+    await page.locator('[data-view3d="top"]').tap();
+    await page.locator('[data-view3d="front"]').tap();
+    await toggle.tap();
+    await page.waitForTimeout(300);
+    check('3D: switching back shows the 2D view again',
+      await page.evaluate(() => !window.LPS3D.isOn() && !document.getElementById('stage').hidden && document.getElementById('stage3d').hidden));
+    check('3D: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
     await context.close();
   }
 
@@ -406,7 +456,8 @@ async function testBuild(browser, file) {
     console.log('Usage: node tests/regression.js <build.html> [more builds...]');
     process.exit(1);
   }
-  const browser = await chromium.launch();
+  // Software WebGL so the 3D view can be tested without a graphics card.
+  const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   let failed = 0;
   for (const file of files) {
     console.log(`\n${path.basename(file)}`);

@@ -47,6 +47,11 @@ the owner's fixture details and the development standards.
 - Never use `alert()`: it pauses the whole app (and running effects) on the iPad. Use
   `lpsNotify('message')` for in-app notices. The only allowed prompt is the import confirmation.
 - Fold-out sections are defined in `SECTIONS` by a marker element, never by position.
+- The 3D view (`setupStage3D`, inside the main stage script) reads the same state through
+  `appearance()` and `movementPosition()`; never keep a separate copy of show data for 3D.
+  Three.js r158 is stored in `<script id="lps-three-lib" type="text/plain">` and only run when
+  3D is first opened. Its sizes (stage 7.3 × 4.9 m, truss 3 m) are defaults until the owner gives
+  real measurements.
 - Before publishing, also run the code checker (ESLint, no-undef / no-unused-vars) and compare
   screenshots of every screen with the previous build when a change should not alter the look.
 

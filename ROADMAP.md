@@ -177,6 +177,7 @@ Who it is for:
 | v0.3.36 | Realistic fixtures + verified profiles: OPPSK PAR with 36 LEDs, upright LM30A with two bars of 4, LF4808 matrix (48 colour + 8 white sections), DJXFLI mover with fixed base and turning head; one selection outline; LM30A, LF4808 and DJXFLI channel maps corrected to the owner's manuals and all four marked verified; 13 new tests (49 total) | Browser-tested; iPad check pending |
 | v0.3.37 | Truss numbered the professional way, stage left to stage right (from the audience: PAR 6 … PAR 1); PAR 7 = SR boom, PAR 8 = SL boom; Stage Right / Stage Left and boom labels on the visualizer; DMX addresses unchanged; saved shows in the old order are updated once (dragged fixtures stay put); 7 new tests (56 total) | Browser-tested; iPad check pending |
 | v0.3.38 | Aligned rig: truss fixtures evenly spaced (49 units, symmetric, LF4808 centred); booms directly under the truss legs; one line for all labels and palette boxes; shows saved before v0.3.37 have every truss position mirrored (nudged ones too) and v0.3.37 shows move to the even spacing; 10 new tests (66 total) | Browser-tested; iPad check pending |
+| v0.3.39 | 3D visualizer prototype: 2D/3D switch on the Stage Visualizer; goal-post truss on tripod legs, stage deck, all 13 fixtures in rig order with soft haze-style beams and floor pools; live colours, effects, Blackout and Move FX (mover heads pan/tilt); PAR 7/8 as floor uplights aimed at the performers; touch orbit/zoom/pan with Front/Top/Reset views; Three.js r158 stored in the file and loaded only when 3D opens (works offline); 2D labels now SR FLOOR / SL FLOOR; 9 new tests (75 total) | Browser-tested; iPad check pending |
 
 ## Master roadmap
 
@@ -249,10 +250,11 @@ Verified DMX channel lists from the owner's manuals are in [`docs/fixture-channe
 **Numbering convention:** units on the truss are numbered from **stage left to stage right**
 (performer's view), the standard in professional lighting paperwork. Seen from the audience they
 read, left to right: PAR 6 · MOVER 2 · LM30A 2 · PAR 5 · PAR 4 · LF4808 · PAR 3 · PAR 2 ·
-LM30A 1 · MOVER 1 · PAR 1. **PAR 7** is on the **stage-right boom** (audience left) and **PAR 8**
-on the **stage-left boom** (audience right). Addresses are grouped by fixture type: PARs 001–050,
+LM30A 1 · MOVER 1 · PAR 1. **PAR 7** is the **stage-right floor uplight** (audience left) and **PAR 8**
+the **stage-left floor uplight** (audience right). Addresses are grouped by fixture type: PARs 001–050,
 movers 057 and 070, LF4808 083, LM30As 098 and 111. On the visualizer the 11 truss units are evenly spaced
-and symmetric about the centre, with the booms directly under the truss legs.
+and symmetric about the centre. PAR 7 and PAR 8 are **floor uplights** on small stands near the foot of each
+truss leg (the rig is a goal-post truss on two tripod legs), aimed up and in at the performers.
 
 Dimensions and DMX modes vary by listing and model revision; verify against the actual
 units before changing any LPS profile.
