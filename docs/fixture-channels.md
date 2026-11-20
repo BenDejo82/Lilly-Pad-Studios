@@ -95,6 +95,52 @@ ENTER to store.
 
 ---
 
-## Betopper LF4808 — 15-channel mode ❓
+## Betopper LF4808 — 15-channel mode ⚠️ (4- and 152-channel modes also listed)
 
-Not provided yet. The app's 15-channel profile is provisional.
+Typed out by the owner from the manual. Wording kept as the manual has it (machine-translated).
+
+### 15-channel mode (the mode the app patches)
+
+| Ch | Value | Function |
+|---|---|---|
+| 1 | 0–255 | Aiming |
+| 2 | 0–255 | R |
+| 3 | 0–255 | G |
+| 4 | 0–255 | B |
+| 5 | 0–255 | W |
+| 6 | 0–255 | Pigment (likely colour presets / colour macro) |
+| 7 | 0–255 | RGB pattern *(listed as "CH?" in the copy; by position this is channel 7)* |
+| 8 | 0–255 | RGB velocity (speed) |
+| 9 | 0–255 | W pattern |
+| 10 | 0–255 | W velocity (speed) |
+| 11 | 0–255 | RGBW strobe |
+| 12 | 0–255 | RGBW pattern |
+| 13 | 0–255 | RGBW velocity (speed) |
+| 14 | 0–255 | Background colour |
+| 15 | 0–255 | Background colour light (brightness) |
+
+**Differs from the app.** App profile `LF4808` assumes: 1 Master dimmer, 2 Strobe, 3 Strobe speed,
+4–7 R/G/B/W, 8 Aiming / pattern position, 9 Effect colour, 10 Pattern select, 11 Pattern speed,
+12 Effect mode, 13 Effect speed, 14 Sound, 15 Reset. Almost every channel differs.
+**Note: this mode has no master dimmer channel.** Brightness comes from the R, G, B and W levels
+(and channel 15 for the background colour). The value ranges inside channels 6–14 (which values
+pick which pattern) aren't listed yet.
+
+### 4-channel mode
+
+| Ch | Value | Function |
+|---|---|---|
+| 1 | 0–255 | R |
+| 2 | 0–255 | G |
+| 3 | 0–255 | B |
+| 4 | 0–255 | W |
+
+### 152-channel mode (pixel control)
+
+| Ch | Value | Function |
+|---|---|---|
+| 1–144 | 0–255 | **48 RGB sections**, 3 channels each: section 1 = ch 1 R, 2 G, 3 B; section 2 = ch 4–6; … section 48 = ch 142–144 |
+| 145–152 | 0–255 | **8 white sections**, 1 channel each: white section 1 = ch 145 … white section 8 = ch 152 |
+
+This tells us the panel's real layout for graphics and future pixel effects: **48 individually
+controllable colour sections and 8 white sections**.
