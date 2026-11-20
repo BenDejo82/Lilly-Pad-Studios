@@ -314,6 +314,46 @@ async function testBuild(browser, file) {
     await context.close();
   }
 
+  // 14. Truss numbering (v0.3.37): numbered stage left to stage right, so from the audience
+  //     (screen) the truss reads PAR 6 … PAR 1 left to right; PAR 7 is the SR boom, PAR 8 the SL boom.
+  {
+    const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
+    const layout = () => page.evaluate(() => [...document.querySelectorAll('.fixture')].map(g => {
+      const m = g.getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)/);
+      return { name: g.getAttribute('aria-label').replace(/ DMX.*/, ''), x: +m[1], y: +m[2] };
+    }));
+    const truss = l => l.filter(f => f.y === 78).sort((a, b) => a.x - b.x).map(f => f.name).join(' · ');
+    const expectedTruss = 'PAR 6 · MOVER 2 · LM30A 2 · PAR 5 · PAR 4 · LF4808 · PAR 3 · PAR 2 · LM30A 1 · MOVER 1 · PAR 1';
+    let l = await layout();
+    check('Numbering: truss runs stage left to stage right', truss(l) === expectedTruss, truss(l));
+    const boom = n => l.find(f => f.name === n);
+    check('Numbering: PAR 7 on the SR boom (screen left), PAR 8 on the SL boom', boom('PAR 7').x < 100 && boom('PAR 8').x > 540);
+    check('Numbering: Stage Right / Stage Left and boom labels are shown',
+      await page.evaluate(() => [...document.querySelectorAll('#stageSvg text')].map(t => t.textContent).join('|'))
+        .then(t => /STAGE RIGHT/.test(t) && /STAGE LEFT/.test(t) && /SR BOOM/.test(t) && /SL BOOM/.test(t)));
+    check('Numbering: DMX addresses unchanged',
+      await page.evaluate(() => ['PAR 1 DMX 1', 'PAR 6 DMX 36', 'MOVER 1 DMX 57', 'LM30A 2 DMX 111', 'LF4808 DMX 83']
+        .every(a => !!document.querySelector(`.fixture[aria-label="${a}"]`))));
+
+    // A show saved before v0.3.37 (old default positions) is renumbered once; dragged fixtures stay.
+    await page.locator('#lpsSaveShow').tap();
+    await page.evaluate(() => {
+      const key = 'lilly-pad-studios-v03', old = [75, 225, 270, 370, 415, 565, 45, 595, 145, 495, 320, 190, 450];
+      const d = JSON.parse(localStorage.getItem(key));
+      delete d.layoutVersion;
+      d.fixtures.forEach((f, i) => { f.x = old[i]; });
+      d.fixtures[10].x = 333; // the LF4808, deliberately dragged
+      localStorage.setItem(key, JSON.stringify(d));
+    });
+    await page.reload(); await page.waitForTimeout(800);
+    l = await layout();
+    check('Numbering: shows saved in the old order are updated on open',
+      truss(l).replace('LF4808', 'X') === expectedTruss.replace('LF4808', 'X'), truss(l));
+    check('Numbering: fixtures the user dragged keep their position', l.find(f => f.name === 'LF4808').x === 333);
+    check('Numbering: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
+    await context.close();
+  }
+
   return results;
 }
 
