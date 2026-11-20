@@ -39,3 +39,17 @@ own address, it doesn't appear in the router's client list; check it with `ping 
 
 Run lights (QLC+ or LPS) while moving faders on the X32 from the iPad, and confirm the mixer stays
 responsive.
+
+## Verified hardware test (November 2026)
+
+First real fixture lit: **PC (QLC+ 5) → audio Wi-Fi → GL.iNet router → Pknight node (LAN2) → DMX cable →
+PAR 1 (address 001, 7-channel)**. QLC+ Universe 1 → Art-Net interface 192.168.8.x, output IP
+**192.168.8.50**, Art-Net universe 0, Standard mode. Channel 1 (master dimmer) and channel 2 (red) at full
+gave red, confirming the OPPSK channel map. The node's Ethernet activity LED on this unit is
+**yellow/amber** and flashes when Art-Net arrives.
+
+Tips learned:
+- QLC+ only lists network interfaces that exist when it starts: join the audio Wi-Fi first, then open QLC+.
+- Windows may switch back to a Wi-Fi network with internet; untick "Connect automatically" on the home
+  Wi-Fi while working on the show network (or use a cable).
+- The OPPSK PAR needs channel 1 (master dimmer) up before its colour channels do anything.
