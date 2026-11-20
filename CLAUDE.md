@@ -33,8 +33,11 @@ the owner's fixture details and the development standards.
    `<title>`.
 3. Make the change. Because lines are very long, edit with exact string replacement and
    check each target string occurs exactly once.
-4. Run the tests on the new build and fix anything that fails:
-   `node tests/regression.js preview/<new build>.html`
+4. Run the tests on the new build, in all three browser engines, and fix anything that fails:
+   `node tests/regression.js preview/<new build>.html` (Chromium: Chrome and Edge), then again with
+   `LPS_BROWSER=webkit` (Safari on Mac, iPad and iPhone) and `LPS_BROWSER=firefox`. Firefox and WebKit
+   come from `npx playwright install firefox webkit` (plus `install-deps` on Linux); in cloud sessions
+   the `lilly-pad-studios` environment allows those downloads.
 5. Commit the new build to `preview/` on `main` (that's how it reaches the iPad), and add a
    row to the version table in `ROADMAP.md`.
 6. Give the owner the iPad link:

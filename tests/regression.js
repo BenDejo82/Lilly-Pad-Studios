@@ -33,6 +33,13 @@ const fixtureColours = (page) => page.evaluate(() =>
   [...document.querySelectorAll('.fixture')].map(g =>
     ['fill', 'fill-opacity'].map(a => g.querySelector('.beam-guide')?.getAttribute(a) || '').join(',')).join('|'));
 
+// Some test browsers (e.g. headless Firefox here) have no WebGL. The app then shows a notice
+// instead of 3D, and the 3D checks verify that notice rather than the 3D scene.
+const hasWebGL = page => page.evaluate(() => {
+  const c = document.createElement('canvas');
+  return !!(c.getContext('webgl2') || c.getContext('webgl'));
+});
+
 const click = (page, selector) => page.evaluate(s => {
   const el = document.querySelector(s);
   if (!el) throw new Error('Missing control: ' + s);
@@ -169,8 +176,14 @@ async function testBuild(browser, file) {
     check('Workflow: Save Cue captures cues', (await cueCount()) === 2, `${await cueCount()} cues`);
     await click(page, '#lpsWorkspaceToggle');
     await click(page, '.tabs [data-tab="show"]');
-    await click(page, '#goCue'); const g1 = await look();
-    await click(page, '#goCue'); const g2 = await look();
+    // Browsers redraw at slightly different moments, so wait (up to 2 s) for the stage to change.
+    const lookAfter = async (selector, previous) => {
+      await click(page, selector);
+      for (let k = 0; k < 20; k++) { const now = await look(); if (now !== previous) return now; }
+      return look();
+    };
+    const g1 = await lookAfter('#goCue', await look());
+    const g2 = await lookAfter('#goCue', g1);
     check('Workflow: GO steps between cues', new Set([g1, g2]).size === 2 && [g1, g2].includes(red) && [g1, g2].includes(blue));
 
     await page.locator('#lpsSaveShow').tap();
@@ -411,6 +424,13 @@ async function testBuild(browser, file) {
       await page.evaluate(() => !document.getElementById('stage').hidden && (!window.LPS3D || !window.LPS3D.isOn())));
     await toggle.tap();
     await page.waitForTimeout(1500);
+    if (!(await hasWebGL(page))) {
+      const notice = await page.evaluate(() => document.getElementById('lpsNotice')?.textContent || '');
+      check('3D: without WebGL, a clear notice appears and 2D stays usable',
+        /WebGL/.test(notice) && await page.evaluate(() => !window.LPS3D.isOn() && !document.getElementById('stage').hidden), notice);
+      check('3D: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
+      await context.close();
+    } else {
     const snap = () => page.evaluate(() => window.LPS3D.snapshot());
     let units = await snap();
     check('3D: opens with all 13 fixtures and hides the 2D view',
@@ -451,6 +471,7 @@ async function testBuild(browser, file) {
       await page.evaluate(() => !window.LPS3D.isOn() && !document.getElementById('stage').hidden && document.getElementById('stage3d').hidden));
     check('3D: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
     await context.close();
+    }
   }
 
   // 17. Full screen (v0.3.40) enlarges whichever stage view is showing, in 2D and 3D, both with the
@@ -462,8 +483,8 @@ async function testBuild(browser, file) {
       await page.evaluate(() => { delete Element.prototype.requestFullscreen; Element.prototype.webkitRequestFullscreen = undefined; });
     }
     const how = fallback ? 'fallback' : 'browser full screen';
-    const vw = await page.evaluate(() => [innerWidth, innerHeight]);
-    for (const view of ['3D', '2D']) {
+    const views = (await hasWebGL(page)) ? ['3D', '2D'] : ['2D'];
+    for (const view of views) {
       const id = view === '3D' ? 'stage3d' : 'stage';
       if (view === '3D') { await page.locator('#stage3dToggle').tap(); await page.waitForTimeout(1200); }
       await click(page, '#expandStage');
@@ -471,9 +492,12 @@ async function testBuild(browser, file) {
       const full = await page.evaluate(id => {
         const v = document.getElementById(id), target = id === 'stage3d' ? v.querySelector('canvas') : v, r = target.getBoundingClientRect();
         const covering = document.elementFromPoint(innerWidth / 2, 60);
-        return { w: Math.round(r.width), h: Math.round(r.height), exit: !v.querySelector('.stage-exit-full').hidden, onTop: v.contains(covering) };
+        // Measured while full: in real full screen the window becomes the whole monitor.
+        return { w: Math.round(r.width), h: Math.round(r.height), screen: [innerWidth, innerHeight],
+          exit: !v.querySelector('.stage-exit-full').hidden, onTop: v.contains(covering) };
       }, id);
-      check(`Full screen: ${view} fills the screen · ${how}`, full.w >= vw[0] - 2 && full.h >= vw[1] - 20 && full.onTop, JSON.stringify(full));
+      check(`Full screen: ${view} fills the screen · ${how}`,
+        full.w >= full.screen[0] - 2 && full.h >= full.screen[1] - 20 && full.onTop, JSON.stringify(full));
       check(`Full screen: ${view} shows its own exit button · ${how}`, full.exit);
       await page.locator(`#${id} .stage-exit-full`).click();
       await page.waitForTimeout(600);
