@@ -248,6 +248,7 @@ management and output as separate modules).
 ## Personal rig (small-production reference)
 
 Verified DMX channel lists from the owner's manuals are in [`docs/fixture-channels.md`](docs/fixture-channels.md).
+The show network (X32 at 192.168.8.200, Art-Net node at 192.168.8.50, unicast only) is in [`docs/network.md`](docs/network.md).
 
 **Numbering convention:** units on the truss are numbered from **stage left to stage right**
 (performer's view), the standard in professional lighting paperwork. Seen from the audience they
