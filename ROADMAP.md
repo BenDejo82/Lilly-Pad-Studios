@@ -176,6 +176,7 @@ Who it is for:
 | v0.3.35 | Code cleanup: docked Stage Visualizer bar no longer sticks to the top; 22 blocking pop-ups replaced with in-app notices; Undo also records keyboard actions; all fold-out sections placed by content; 14 style blocks merged into one with dead and overridden rules removed (screens pixel-identical); hidden duplicate Quick Color code and unused values removed; test suite expanded to 36 checks | Passed on iPad · **released as stable `index.html`** |
 | v0.3.36 | Realistic fixtures + verified profiles: OPPSK PAR with 36 LEDs, upright LM30A with two bars of 4, LF4808 matrix (48 colour + 8 white sections), DJXFLI mover with fixed base and turning head; one selection outline; LM30A, LF4808 and DJXFLI channel maps corrected to the owner's manuals and all four marked verified; 13 new tests (49 total) | Browser-tested; iPad check pending |
 | v0.3.37 | Truss numbered the professional way, stage left to stage right (from the audience: PAR 6 … PAR 1); PAR 7 = SR boom, PAR 8 = SL boom; Stage Right / Stage Left and boom labels on the visualizer; DMX addresses unchanged; saved shows in the old order are updated once (dragged fixtures stay put); 7 new tests (56 total) | Browser-tested; iPad check pending |
+| v0.3.38 | Aligned rig: truss fixtures evenly spaced (49 units, symmetric, LF4808 centred); booms directly under the truss legs; one line for all labels and palette boxes; shows saved before v0.3.37 have every truss position mirrored (nudged ones too) and v0.3.37 shows move to the even spacing; 10 new tests (66 total) | Browser-tested; iPad check pending |
 
 ## Master roadmap
 
@@ -250,7 +251,8 @@ Verified DMX channel lists from the owner's manuals are in [`docs/fixture-channe
 read, left to right: PAR 6 · MOVER 2 · LM30A 2 · PAR 5 · PAR 4 · LF4808 · PAR 3 · PAR 2 ·
 LM30A 1 · MOVER 1 · PAR 1. **PAR 7** is on the **stage-right boom** (audience left) and **PAR 8**
 on the **stage-left boom** (audience right). Addresses are grouped by fixture type: PARs 001–050,
-movers 057 and 070, LF4808 083, LM30As 098 and 111.
+movers 057 and 070, LF4808 083, LM30As 098 and 111. On the visualizer the 11 truss units are evenly spaced
+and symmetric about the centre, with the booms directly under the truss legs.
 
 Dimensions and DMX modes vary by listing and model revision; verify against the actual
 units before changing any LPS profile.

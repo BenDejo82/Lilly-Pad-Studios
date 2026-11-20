@@ -335,22 +335,65 @@ async function testBuild(browser, file) {
       await page.evaluate(() => ['PAR 1 DMX 1', 'PAR 6 DMX 36', 'MOVER 1 DMX 57', 'LM30A 2 DMX 111', 'LF4808 DMX 83']
         .every(a => !!document.querySelector(`.fixture[aria-label="${a}"]`))));
 
-    // A show saved before v0.3.37 (old default positions) is renumbered once; dragged fixtures stay.
-    await page.locator('#lpsSaveShow').tap();
-    await page.evaluate(() => {
-      const key = 'lilly-pad-studios-v03', old = [75, 225, 270, 370, 415, 565, 45, 595, 145, 495, 320, 190, 450];
-      const d = JSON.parse(localStorage.getItem(key));
-      delete d.layoutVersion;
-      d.fixtures.forEach((f, i) => { f.x = old[i]; });
-      d.fixtures[10].x = 333; // the LF4808, deliberately dragged
+    // Shows saved by earlier builds are updated once on open.
+    const saveWith = (layoutVersion, xs, tweak) => page.evaluate(([layoutVersion, xs, tweak]) => {
+      const key = 'lilly-pad-studios-v03', d = JSON.parse(localStorage.getItem(key));
+      if (layoutVersion) d.layoutVersion = layoutVersion; else delete d.layoutVersion;
+      d.fixtures.forEach((f, i) => { f.x = xs[i]; f.y = (i === 6 || i === 7) ? 175 : 78; });
+      if (tweak) d.fixtures[10].x = tweak;
       localStorage.setItem(key, JSON.stringify(d));
-    });
+    }, [layoutVersion, xs, tweak]);
+    await page.locator('#lpsSaveShow').tap();
+    // Before v0.3.37: numbered the wrong way round, with the LF4808 nudged off its default spot.
+    await saveWith(null, [75, 225, 270, 370, 415, 565, 45, 595, 145, 495, 320, 190, 450], 333);
     await page.reload(); await page.waitForTimeout(800);
     l = await layout();
-    check('Numbering: shows saved in the old order are updated on open',
+    check('Numbering: shows saved before v0.3.37 are renumbered on open',
       truss(l).replace('LF4808', 'X') === expectedTruss.replace('LF4808', 'X'), truss(l));
-    check('Numbering: fixtures the user dragged keep their position', l.find(f => f.name === 'LF4808').x === 333);
+    check('Numbering: nudged truss fixtures are mirrored too', l.find(f => f.name === 'LF4808').x === 307);
+    // v0.3.37: right numbering, uneven spacing.
+    await page.locator('#lpsSaveShow').tap();
+    await saveWith(2, [565, 415, 370, 270, 225, 75, 45, 595, 495, 145, 320, 450, 190]);
+    await page.reload(); await page.waitForTimeout(800);
+    l = await layout();
+    check('Alignment: shows saved by v0.3.37 move to the even spacing',
+      truss(l) === expectedTruss && l.find(f => f.name === 'PAR 2').x === 418);
     check('Numbering: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
+    await context.close();
+  }
+
+  // 15. Alignment (v0.3.38): even truss spacing, one line for labels and palettes, every beam and
+  //     palette centred under its fixture, booms directly under the truss legs.
+  for (const detailed of [false, true]) {
+    const { context, page } = await newPage(browser, file, 'iPad landscape');
+    if (detailed) { await click(page, '#stageMode'); await page.waitForTimeout(300); }
+    const m = await page.evaluate(() => {
+      const svg = document.getElementById('stageSvg'), inv = svg.getScreenCTM().inverse();
+      const box = el => { const r = el.getBoundingClientRect(), p = svg.createSVGPoint(), q = svg.createSVGPoint();
+        p.x = r.left; p.y = r.top; q.x = r.right; q.y = r.bottom; const a = p.matrixTransform(inv), b = q.matrixTransform(inv);
+        return { cx: (a.x + b.x) / 2, top: a.y, bottom: b.y }; };
+      const fx = [...document.querySelectorAll('.fixture')].map(g => {
+        const t = g.getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)\)/);
+        const pick = s => g.querySelector(s) ? box(g.querySelector(s)) : null;
+        return { x: +t[1], y: +t[2], beam: pick('.beam-guide'), label: pick('text'), pal: pick('.quick-color-trigger') };
+      });
+      const legs = document.querySelector('#stageSvg path[d^="M65 78L"]').getAttribute('d').match(/L([\d.]+) ([\d.]+)/g).map(s => s.slice(1).split(' ').map(Number));
+      return { fx, legs };
+    });
+    const truss = m.fx.filter(f => f.y === 78).sort((a, b) => a.x - b.x);
+    const gaps = truss.slice(1).map((f, i) => Math.round(f.x - truss[i].x));
+    const mode = detailed ? 'Detailed view' : 'Clean view';
+    check(`Alignment: truss fixtures evenly spaced · ${mode}`, new Set(gaps).size === 1, gaps.join(','));
+    check(`Alignment: every beam centred under its fixture · ${mode}`, m.fx.every(f => !f.beam || Math.abs(f.beam.cx - f.x) < 0.6));
+    if (detailed) {
+      const one = vals => Math.max(...vals) - Math.min(...vals) < 0.6;
+      check('Alignment: truss labels on one line', one(truss.map(f => f.label.bottom)));
+      check('Alignment: truss palette boxes on one line and centred', one(truss.map(f => f.pal.top)) && m.fx.every(f => Math.abs(f.pal.cx - f.x) < 0.6));
+      check('Alignment: labels clear of palette boxes', m.fx.every(f => f.label.bottom <= f.pal.top));
+    }
+    const booms = m.fx.filter(f => f.y !== 78).sort((a, b) => a.x - b.x);
+    check(`Alignment: booms hang directly under the truss legs · ${mode}`,
+      booms.length === 2 && Math.abs(booms[0].x - m.legs[0][0]) < 0.6 && Math.abs(booms[1].x - m.legs[1][0]) < 0.6, JSON.stringify(m.legs));
     await context.close();
   }
 
@@ -371,7 +414,7 @@ async function testBuild(browser, file) {
     try {
       results = await testBuild(browser, file);
     } catch (e) {
-      results = [{ name: 'Test run', ok: false, detail: e.message.split('\n')[0] }];
+      results = [{ name: 'Test run', ok: false, detail: e.message.split('\n')[0] + ' @ ' + (e.stack.split('\n').find(l => l.includes('regression.js')) || '').trim() }];
     }
     for (const r of results) {
       if (!r.ok) failed++;
