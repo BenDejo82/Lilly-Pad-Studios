@@ -3,13 +3,17 @@
 // core features still work, so a visual change can't quietly break an effect.
 //
 // Usage:   node tests/regression.js <build.html> [more builds...]
+// Engines: LPS_BROWSER=chromium (default, Chrome/Edge) | firefox | webkit (Safari's engine)
 // Example: node tests/regression.js preview/Lilly_Pad_Studios_v0.3.35_Code_Cleanup_TEST.html
-// Needs:   Playwright (npm install playwright, then npx playwright install chromium)
+// Needs:   Playwright (npm install playwright, then npx playwright install chromium firefox webkit)
 //
 // Exit code is 0 when every check passes, 1 otherwise.
 
 const path = require('path');
-const { chromium, devices } = require('playwright');
+const playwright = require('playwright');
+const { devices } = playwright;
+const ENGINE = process.env.LPS_BROWSER || 'chromium';
+if (!['chromium', 'firefox', 'webkit'].includes(ENGINE)) throw new Error('LPS_BROWSER must be chromium, firefox or webkit');
 
 const VIEWS = {
   'iPad landscape': { ...devices['iPad Pro 11 landscape'] },
@@ -36,7 +40,9 @@ const click = (page, selector) => page.evaluate(s => {
 }, selector);
 
 async function newPage(browser, file, view, reducedMotion = 'no-preference') {
-  const context = await browser.newContext({ ...VIEWS[view], reducedMotion });
+  const options = { ...VIEWS[view], reducedMotion };
+  if (ENGINE === 'firefox') delete options.isMobile; // Firefox can't emulate a mobile viewport; touch still works
+  const context = await browser.newContext(options);
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
@@ -489,8 +495,10 @@ async function testBuild(browser, file) {
     console.log('Usage: node tests/regression.js <build.html> [more builds...]');
     process.exit(1);
   }
-  // Software WebGL so the 3D view can be tested without a graphics card.
-  const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  // Chromium: software WebGL so the 3D view can be tested without a graphics card.
+  const browser = await playwright[ENGINE].launch(ENGINE === 'chromium'
+    ? { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] } : {});
+  console.log(`Engine: ${ENGINE} ${browser.version()}`);
   let failed = 0;
   for (const file of files) {
     console.log(`\n${path.basename(file)}`);
