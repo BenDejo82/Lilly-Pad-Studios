@@ -30,7 +30,7 @@ The card confirms **13 channels** (the 12-channel manual found online is a diffe
 
 | Ch | Value | Function |
 |---|---|---|
-| 1–4 | | ❓ **Not on the photographed card.** Expected to be movement (e.g. Pan, Pan fine, Tilt, Tilt fine) — needs confirming |
+| 1–4 | 0–255 | **Pan and tilt (movement).** Owner confirms these are the movement channels; the exact order is still to be checked: usually 1 Pan, 2 Pan fine, 3 Tilt, 4 Tilt fine (some fixtures use 1 Pan, 2 Tilt, 3 Pan fine, 4 Tilt fine) |
 | 5 | 0–255 | X/Y axis speed (fast → slow) |
 | 6 | 0–255 | Total dimming (dark → bright) |
 | 7 | 0 | Strobe: no function |
