@@ -447,6 +447,39 @@ async function testBuild(browser, file) {
     await context.close();
   }
 
+  // 17. Full screen (v0.3.40) enlarges whichever stage view is showing, in 2D and 3D, both with the
+  //     browser's full screen and with the fill-the-window fallback used where that isn't available
+  //     (iPhone, some iPads). Each view has its own exit button.
+  for (const fallback of [false, true]) {
+    const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
+    if (fallback) {
+      await page.evaluate(() => { delete Element.prototype.requestFullscreen; Element.prototype.webkitRequestFullscreen = undefined; });
+    }
+    const how = fallback ? 'fallback' : 'browser full screen';
+    const vw = await page.evaluate(() => [innerWidth, innerHeight]);
+    for (const view of ['3D', '2D']) {
+      const id = view === '3D' ? 'stage3d' : 'stage';
+      if (view === '3D') { await page.locator('#stage3dToggle').tap(); await page.waitForTimeout(1200); }
+      await click(page, '#expandStage');
+      await page.waitForTimeout(700);
+      const full = await page.evaluate(id => {
+        const v = document.getElementById(id), target = id === 'stage3d' ? v.querySelector('canvas') : v, r = target.getBoundingClientRect();
+        const covering = document.elementFromPoint(innerWidth / 2, 60);
+        return { w: Math.round(r.width), h: Math.round(r.height), exit: !v.querySelector('.stage-exit-full').hidden, onTop: v.contains(covering) };
+      }, id);
+      check(`Full screen: ${view} fills the screen · ${how}`, full.w >= vw[0] - 2 && full.h >= vw[1] - 20 && full.onTop, JSON.stringify(full));
+      check(`Full screen: ${view} shows its own exit button · ${how}`, full.exit);
+      await page.locator(`#${id} .stage-exit-full`).click();
+      await page.waitForTimeout(600);
+      const after = await page.evaluate(id => ({ fs: !!document.fullscreenElement, expanded: document.getElementById(id).classList.contains('expanded'),
+        label: document.getElementById('expandStage').textContent }), id);
+      check(`Full screen: ${view} exit returns to the panel · ${how}`, !after.fs && !after.expanded && after.label === 'Full screen', JSON.stringify(after));
+      if (view === '3D') { await page.locator('#stage3dToggle').tap(); await page.waitForTimeout(300); }
+    }
+    check(`Full screen: no errors · ${how}`, errors.length === 0, errors.slice(0, 2).join(' / '));
+    await context.close();
+  }
+
   return results;
 }
 
