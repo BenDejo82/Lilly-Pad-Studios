@@ -241,6 +241,8 @@ management and output as separate modules).
 
 ## Personal rig (small-production reference)
 
+Verified DMX channel lists from the owner's manuals are in [`docs/fixture-channels.md`](docs/fixture-channels.md).
+
 Dimensions and DMX modes vary by listing and model revision; verify against the actual
 units before changing any LPS profile.
 
