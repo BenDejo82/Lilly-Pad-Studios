@@ -174,6 +174,7 @@ Who it is for:
 | v0.3.33 | FX ENGINE and Pro LIVE fold-out sections fixed: panels were sorted by position and had shifted one section down (Flash FX was empty, its settings sat in Effect Programming). Now sorted by what each panel contains | Browser-tested; iPad check pending |
 | v0.3.34 | Stage view directly under the Stage Visualizer bar; zoom, beam guides, view and Edit layout grouped as "View & Layout" at the bottom of the panel | Browser-tested; iPad check pending |
 | v0.3.35 | Code cleanup: docked Stage Visualizer bar no longer sticks to the top; 22 blocking pop-ups replaced with in-app notices; Undo also records keyboard actions; all fold-out sections placed by content; 14 style blocks merged into one with dead and overridden rules removed (screens pixel-identical); hidden duplicate Quick Color code and unused values removed; test suite expanded to 36 checks | Passed on iPad · **released as stable `index.html`** |
+| v0.3.36 | Realistic fixtures + verified profiles: OPPSK PAR with 36 LEDs, upright LM30A with two bars of 4, LF4808 matrix (48 colour + 8 white sections), DJXFLI mover with fixed base and turning head; one selection outline; LM30A, LF4808 and DJXFLI channel maps corrected to the owner's manuals and all four marked verified; 13 new tests (49 total) | Browser-tested; iPad check pending |
 
 ## Master roadmap
 

@@ -261,6 +261,59 @@ async function testBuild(browser, file) {
     await context.close();
   }
 
+  // 12. Fixture drawings (v0.3.36): each type is drawn as the real unit, and only its lenses glow.
+  {
+    const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
+    const fixture = name => `.fixture[aria-label^="${name} "]`;
+    const lensCount = name => page.evaluate(sel => document.querySelector(sel + ' .led')?.children.length ?? 0, fixture(name));
+    check('Fixtures: OPPSK PAR shows 36 LEDs', (await lensCount('PAR 1')) === 36);
+    check('Fixtures: LM30A shows two bars of 4 lenses', (await lensCount('LM30A 1')) === 8);
+    check('Fixtures: LF4808 shows 48 colour sections', (await lensCount('LF4808')) === 48);
+    check('Fixtures: LF4808 shows 8 white sections',
+      (await page.evaluate(sel => document.querySelectorAll(sel + ' .white-section').length, fixture('LF4808'))) === 8);
+    check('Fixtures: mover lens and head turn with the beam',
+      await page.evaluate(sel => !!document.querySelector(sel + ' .aim-assembly .led'), fixture('MOVER 1')));
+
+    const lensState = name => page.evaluate(sel => {
+      const led = document.querySelector(sel + ' .led');
+      return { fill: led.getAttribute('fill'), opacity: Number(led.getAttribute('opacity')) };
+    }, fixture(name));
+    await page.locator('[data-quick-group="pars"]').tap();
+    await page.locator('#swatches .swatch', { hasText: 'RED' }).tap();
+    await page.waitForTimeout(200);
+    const lit = await lensState('PAR 1');
+    check('Fixtures: lenses glow in the programmed colour', lit.fill === 'rgb(255,0,0)' && lit.opacity > 0.3, JSON.stringify(lit));
+    await page.locator('#blackout').tap();
+    await page.waitForTimeout(200);
+    const dark = await lensState('PAR 1');
+    const housing = await page.evaluate(sel => document.querySelectorAll(sel + ' circle, ' + sel + ' rect').length, fixture('PAR 1'));
+    check('Fixtures: Blackout darkens the lenses but the housing stays visible', dark.opacity === 0 && housing > 36, JSON.stringify(dark));
+    check('Fixtures: selection is one outline (no old dashed rings)',
+      await page.evaluate(() => document.querySelectorAll('.fixture .select-ring').length === document.querySelectorAll('.fixture').length
+        && !document.querySelector('.fixture circle.core')));
+    check('Fixtures: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
+    await context.close();
+  }
+
+  // 13. DMX channel maps match the owner's manuals (docs/fixture-channels.md) and are verified.
+  {
+    const { context, page } = await newPage(browser, file, 'iPad landscape');
+    await click(page, '#selectAll');
+    await page.waitForTimeout(200);
+    const details = await page.evaluate(() => document.getElementById('fixtureProfileDetails').textContent);
+    const expected = {
+      'PAR 1': '1 Master dimmer · 2 Red · 3 Green · 4 Blue · 5 RGB colour function · 6 Strobe speed · 7 Mode',
+      'MOVER 1': '1 Pan · 2 Pan fine · 3 Tilt · 4 Tilt fine · 5 Pan / tilt speed · 6 Master dimmer · 7 Strobe (1–25 Hz) · 8 Red · 9 Green · 10 Blue · 11 White · 12 Macro: DMX / auto / sound · 13 Reset',
+      'LF4808': '1 Aiming · 2 Red · 3 Green · 4 Blue · 5 White · 6 Pigment (colour preset) · 7 RGB pattern · 8 RGB pattern speed · 9 White pattern · 10 White pattern speed · 11 RGBW strobe · 12 RGBW pattern · 13 RGBW pattern speed · 14 Background colour · 15 Background colour brightness',
+      'LM30A 1': '1 Tilt motor 1 · 2 Tilt motor 2 · 3 Master dimmer · 4 Strobe · 5 Red bar 1 · 6 Green bar 1 · 7 Blue bar 1 · 8 White bar 1 · 9 White bar 2 · 10 Blue bar 2 · 11 Green bar 2 · 12 Red bar 2 · 13 Reset / sound',
+    };
+    for (const [name, channels] of Object.entries(expected)) {
+      const block = details.split(/\n(?=\S)/).find(b => b.startsWith(name + ':')) || '';
+      check(`Profiles: ${name} channel map matches the manual and is verified`, block.includes('verified') && block.includes(channels));
+    }
+    await context.close();
+  }
+
   return results;
 }
 

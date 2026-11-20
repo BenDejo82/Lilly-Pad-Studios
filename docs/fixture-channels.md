@@ -2,7 +2,7 @@
 
 Source: photos of the owner's printed manuals and channel cards (November 2026).
 These are the reference for the app's fixture profiles (`fixtureProfiles` in each build).
-**Nothing here has changed the app yet**: profile changes need a reviewed, approved build.
+**Since v0.3.36 the app's profiles match these lists and are marked verified.**
 
 Status key: ✅ matches the app · ⚠️ differs from the app · ❓ still needed
 
@@ -24,7 +24,7 @@ App profile `OPPSK_PAR` matches this order.
 
 ---
 
-## DJXFLI 90W moving head — 13-channel mode ⚠️ (complete)
+## DJXFLI 90W moving head — 13-channel mode ✅
 
 The card confirms **13 channels** (the 12-channel manual found online is a different variant).
 Channels 1–4 confirmed from the full manual table. In DMX mode with no signal, the display's first digit flickers.
@@ -49,7 +49,7 @@ Channels 1–4 confirmed from the full manual table. In DMX mode with no signal,
 | 13 | 0–240 | Reset: no function |
 | 13 | 241–255 | Reset: fixture reset (hold 5 s) |
 
-**Differs from the app.** App profile `DJXFLI_MOVER` assumes: 1 Pan, 2 Tilt, 3 Pan/tilt speed,
+**Fixed in v0.3.36.** Before that, the app differed: App profile `DJXFLI_MOVER` assumes: 1 Pan, 2 Tilt, 3 Pan/tilt speed,
 4 Master dimmer, 5 Strobe, 6–9 R/G/B/W, 10 Color auto, 11 Motor auto, 12 Built-in programs,
 13 Reset. Everything from channel 3 on is shifted compared with the card.
 
@@ -83,7 +83,7 @@ each other however they're hung.
 
 ---
 
-## Betopper LM30A — 13-channel mode ⚠️ (7-channel mode also listed)
+## Betopper LM30A — 13-channel mode ✅ (7-channel mode also listed)
 
 ### 13-channel mode (the mode the app patches)
 
@@ -127,7 +127,7 @@ ENTER to store.
 
 ---
 
-## Betopper LF4808 — 15-channel mode ⚠️ (4- and 152-channel modes also listed)
+## Betopper LF4808 — 15-channel mode ✅ (4- and 152-channel modes also listed)
 
 Typed out by the owner from the manual. Wording kept as the manual has it (machine-translated).
 
@@ -151,7 +151,7 @@ Typed out by the owner from the manual. Wording kept as the manual has it (machi
 | 14 | 0–255 | Background colour |
 | 15 | 0–255 | Background colour light (brightness) |
 
-**Differs from the app.** App profile `LF4808` assumes: 1 Master dimmer, 2 Strobe, 3 Strobe speed,
+**Fixed in v0.3.36.** Before that, the app differed: App profile `LF4808` assumes: 1 Master dimmer, 2 Strobe, 3 Strobe speed,
 4–7 R/G/B/W, 8 Aiming / pattern position, 9 Effect colour, 10 Pattern select, 11 Pattern speed,
 12 Effect mode, 13 Effect speed, 14 Sound, 15 Reset. Almost every channel differs.
 **Note: this mode has no master dimmer channel.** Brightness comes from the R, G, B and W levels
