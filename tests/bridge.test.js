@@ -63,9 +63,12 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     const header = m && m.subarray(0, 8).toString('ascii') === 'Art-Net\0' && m.readUInt16LE(8) === 0x5000
       && m.readUInt16BE(10) === 14 && m.readUInt16BE(16) === 512 && m.length === 530;
     check('Art-Net: packets are valid ArtDmx (Art-Net 4, 512 channels)', !!header);
-    check('Art-Net: universe 1 goes to Art-Net universe 0 and universe 2 to 1', !!latest(0) && !!latest(1));
+    // Bridge 0.4.0: only universe 1 is sent. An unused, all-zero universe 2 made the Pknight node (which outputs
+    // every universe it receives) alternate between the show and zeros: flicker, wrong colours, twitchy movers.
+    check('Art-Net: only universe 1 is sent (as Art-Net universe 0); no empty universe 2', !!latest(0) && !latest(1)
+      && packets.every(p => (p.msg[14] | (p.msg[15] << 8)) === 0));
     const first = packets.length; await wait(1000); const rate = packets.length - first;
-    check('Art-Net: refreshes about 30 times a second per universe', rate >= 40 && rate <= 80, `${rate} packets/s for 2 universes`);
+    check('Art-Net: refreshes about 30 times a second', rate >= 20 && rate <= 40, `${rate} packets/s`);
 
     await page.locator('[data-quick-group="pars"]').tap();
     await page.locator('#swatches .swatch', { hasText: 'RED' }).tap();

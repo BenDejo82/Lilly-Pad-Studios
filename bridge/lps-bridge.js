@@ -27,13 +27,17 @@ const dgram = require('dgram');
 const crypto = require('crypto');
 const os = require('os');
 
-const VERSION = '0.3.0';
+const VERSION = '0.4.0';
 const ROOT = path.resolve(__dirname, '..');
 const DEFAULTS = {
   nodeIp: '192.168.8.50',   // the Art-Net node
   artnetPort: 6454,         // standard Art-Net port
   httpPort: 8080,           // where the app is served
-  universes: { 1: 0, 2: 1 }, // LPS universe -> Art-Net universe (Net 0, Sub-Net 0)
+  // LPS universe -> Art-Net universe (Net 0, Sub-Net 0). Only these universes are sent.
+  // One universe by default: some nodes (e.g. the Pknight CR011R) output every universe they receive,
+  // so sending an unused, all-zero universe 2 made the lights flicker between the show and zeros.
+  // Add "2": 1 here only when fixtures are patched to universe 2 (and it has its own output).
+  universes: { 1: 0 },
   fps: 30,                  // Art-Net refresh rate
   lostAfterMs: 1000,        // silence before the failsafe starts
   safeFadeSeconds: 3,       // fade to the safe look
@@ -128,12 +132,15 @@ setInterval(() => step(Date.now()), Math.round(1000 / config.fps));
 
 // ───────────── Messages from the app ─────────────
 // Binary message: byte 0 = type (1 = live, 2 = safe look, 3 = take control), byte 1 = flags
-// (bit 0 = send to lights), then 512 bytes for each LPS universe in order 1, 2.
+// (bit 0 = send to lights), then 512 bytes for each LPS universe in order 1, 2, … The app always sends
+// universes 1 and 2; the bridge keeps only the ones listed in config.universes.
 // Frames from a device that isn't in control are ignored.
 function onAppMessage(socket, buf) {
   if (buf[0] === 3) { giveControl(socket); return; }
-  if (socket !== controller || buf.length !== 2 + 512 * lpsUniverses.length) return;
-  const frame = Object.fromEntries(lpsUniverses.map((u, k) => [u, new Uint8Array(buf.subarray(2 + k * 512, 2 + (k + 1) * 512))]));
+  const count = (buf.length - 2) / 512;
+  if (socket !== controller || !Number.isInteger(count) || count < 1) return;
+  if (lpsUniverses.some(u => u > count)) return; // a configured universe the app didn't send
+  const frame = Object.fromEntries(lpsUniverses.map(u => [u, new Uint8Array(buf.subarray(2 + (u - 1) * 512, 2 + u * 512))]));
   lastMessage = Date.now();
   if (buf[0] === 1) { live = frame; sendEnabled = (buf[1] & 1) === 1; }
   else if (buf[0] === 2) safe = frame;
@@ -250,7 +257,7 @@ server.listen(config.httpPort, () => {
   const addresses = Object.values(os.networkInterfaces()).flat()
     .filter(a => a && a.family === 'IPv4' && !a.internal).map(a => a.address);
   console.log(`\nLPS Bridge ${VERSION} is running.`);
-  console.log(`Sending Art-Net to ${config.nodeIp} (universe 1 -> Art-Net ${config.universes[1]}).`);
+  console.log(`Sending Art-Net to ${config.nodeIp}: ${lpsUniverses.map(u => `universe ${u} -> Art-Net ${config.universes[u]}`).join(', ')}.`);
   console.log('\nOpen Lilly Pad Studios from any device on the show network:');
   for (const a of addresses) console.log(`   http://${a}:${config.httpPort}`);
   console.log('\nLeave this window open during the show. Close it to stop the bridge.\n');

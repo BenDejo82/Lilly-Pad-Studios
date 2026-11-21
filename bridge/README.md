@@ -5,8 +5,8 @@ Art-Net, so this small program does it for them. It runs on a computer on the sh
 a Raspberry Pi in the rack) and:
 
 - **serves Lilly Pad Studios** on the show network, so the iPad or any computer can open it;
-- **sends the app's DMX values as Art-Net** to the Pknight node at `192.168.8.50`, about 30 times a
-  second, straight to the node (never broadcast, so the X32's Wi-Fi stays clear);
+- **sends the app's DMX values as Art-Net** (universe 1) to the Pknight node at `192.168.8.50`, about 30
+  times a second, straight to the node (never broadcast, so the X32's Wi-Fi stays clear);
 - **fails safe:** if the app goes quiet for 1 second (iPad asleep, Wi-Fi drop, app closed), it fades
   over 3 seconds to the show's **safe look** (calm white by default: PARs and LM30As soft white,
   movers low white parked facing the stage, LF4808 off) and holds it until the app comes back.
@@ -47,7 +47,7 @@ Defaults suit the owner's rig (see `docs/network.md`). To change them, copy
 |---|---|---|
 | `nodeIp` | `192.168.8.50` | The Art-Net node's address |
 | `httpPort` | `8080` | Port for opening the app |
-| `universes` | `{"1": 0, "2": 1}` | LPS universe → Art-Net universe |
+| `universes` | `{"1": 0}` | LPS universe → Art-Net universe. **Only listed universes are sent.** Add `"2": 1` only when fixtures are patched to universe 2 and it has its own output (the Pknight node outputs every universe it receives) |
 | `fps` | `30` | Art-Net refresh rate |
 | `lostAfterMs` | `1000` | Silence before the failsafe starts |
 | `safeFadeSeconds` | `3` | Fade to the safe look |
@@ -63,3 +63,9 @@ Defaults suit the owner's rig (see `docs/network.md`). To change them, copy
 - If the **bridge stops unexpectedly** (computer crash or power loss) it can't send anything, and the
   Pknight node **holds the last values** (tested). That's why the calm-white failsafe matters during a show.
 - Tests: `node tests/bridge.test.js` runs the bridge against a simulated Art-Net node.
+
+## Troubleshooting
+
+- **Lights flicker, colours or movement act strangely, but they work in QLC+:** make sure **QLC+ (or any other
+  lighting program) is closed** while the bridge runs. Two programs sending to the node at once fight over
+  the lights. Also check `bridge-config.json` (if you made one) lists only universe 1 unless you really use 2.

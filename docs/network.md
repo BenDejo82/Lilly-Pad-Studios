@@ -59,4 +59,9 @@ Tips learned:
 - One controlling device at a time worked: the PC took control, the iPad showed Viewing only, and
   Take control on the iPad got it back.
 - When the bridge window is closed, the **Pknight node holds the last values** (the lights stay on in
-  their last look).
+  their last look). Since bridge 0.3.0 the bridge fades to blackout before it closes.
+- **The Pknight node appears to output every Art-Net universe it receives**, not only its own. With the
+  bridge sending universe 1 (the show) and an empty universe 2, the mover flickered, ignored colours and
+  twitched, while the same mover worked perfectly from QLC+ sending universe 1 only. Since bridge 0.4.0
+  only universe 1 is sent. If a second universe is ever needed, give it its own node.
+- **Only one program may send to the node at a time.** Close QLC+ before starting the bridge.
