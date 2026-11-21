@@ -25,9 +25,15 @@ a Raspberry Pi in the rack) and:
    - A window opens with addresses like `http://192.168.8.107:8080`. **Leave it open.**
 2. On the iPad (on the show Wi-Fi) or the computer, open that address in the browser.
 3. The header changes from **SIMULATION ONLY** to **LIVE · ART-NET 192.168.8.50**. You're live.
-   - **Send to lights: On/Off** (in the top bar) pauses the output: the lights hold their look while
-     you program, then follow the app again when you switch it back on.
-4. To stop, close the bridge window. The node keeps its last values (see below).
+   - **Send to lights: On/Off** (next to the LIVE pill, top right) pauses the output: the lights hold
+     their look while you program, then follow the app again when you switch it back on.
+   - **One device controls the lights at a time**: the one that connected most recently. Any other open
+     copy shows **VIEWING ONLY** and a **Take control** button.
+   - **PATCH → DMX Output Monitor → Preview safe look** shows the safe look on screen **and on the
+     lights**; tap it again to return to the show.
+4. **Test the failsafe**: with the app live, lock the iPad (or close the browser tab). About a second
+   later the lights fade over 3 seconds to the safe look; unlock and reopen to return to the show.
+5. To stop, close the bridge window. The node keeps its last values (see below).
 
 On Mac, Linux or Raspberry Pi, run `start-lps-bridge.sh` instead (`sh start-lps-bridge.sh`).
 

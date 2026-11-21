@@ -83,17 +83,49 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await wait(400);
     check('Send to lights on: the lights follow the app again', values(0, 2, 3).join() === '0,0,255', values(0, 1, 7).join());
 
+    // v0.3.44: Preview safe look also sends the safe look to the lights while it's on.
     const safe = await page.evaluate(() => [...window.LPSDMX.safeFrame()[1].slice(0, 7)]);
+    await page.evaluate(() => { document.getElementById('lpsWorkspaceToggle').click(); document.querySelector('.tabs [data-tab="patch"]').click();
+      document.querySelectorAll('#patch details').forEach(d => { d.open = true; }); });
+    await page.locator('#safeLookPreview').click();
+    await wait(400);
+    check('Preview safe look: shows the safe look on the lights', values(0, 1, 7).join() === safe.join(), values(0, 1, 7).join());
+    await page.locator('#safeLookPreview').click();
+    await wait(400);
+    check('Preview safe look: tapping again returns the lights to the show', values(0, 2, 3).join() === '0,0,255', values(0, 1, 7).join());
+
+    // v0.3.44: one device controls the lights. A second device takes control; the first only views.
+    const second = await context.newPage();
+    await second.goto(`http://127.0.0.1:${HTTP_PORT}/`);
+    await wait(1500);
+    check('Control: the newest device takes control', /LIVE/.test(await second.textContent('header .status')));
+    check('Control: the other device shows Viewing only and a Take control button',
+      /VIEWING ONLY/.test(await page.textContent('header .status')) && (await page.textContent('#bridgeOutput')) === 'Take control',
+      await page.textContent('header .status'));
+    await page.evaluate(() => [...document.querySelectorAll('#swatches .swatch')].find(x => x.textContent.trim() === 'GREEN').click());
+    await wait(400);
+    const secondFrame = await second.evaluate(() => [...window.LPSDMX.frame()[1]]);
+    check('Control: the viewing device can\'t change the lights', JSON.stringify(values(0, 1, 512)) === JSON.stringify(secondFrame));
+    await page.locator('#bridgeOutput').click();
+    await wait(1200);
+    check('Control: Take control hands the lights back', /LIVE/.test(await page.textContent('header .status'))
+      && /VIEWING ONLY/.test(await second.textContent('header .status')), await page.textContent('header .status'));
+    check('Control: the lights follow the device in control', values(0, 2, 3).join() === '0,255,0', values(0, 1, 7).join());
+
+    // The controlling device is lost while another device is still open (viewing): failsafe must still run.
     await page.close(); // the app disappears (iPad asleep, Wi-Fi drop, app closed)
     await wait(1000 + 1500);
     const mid = values(0, 1, 7);
-    // Halfway from the blue look (dimmer 204, blue) to calm white (dimmer 102, white): in between.
-    check('Failsafe: starts fading to the safe look about a second after the app is lost',
+    // Halfway from the green look (dimmer 204, green) to calm white (dimmer 102, white): in between.
+    check('Failsafe: starts fading to the safe look about a second after the controlling device is lost',
       mid[0] < 204 && mid[0] > 102 && mid[1] > 0 && mid[1] < 255, mid.join());
     await wait(2000);
     check('Failsafe: holds the calm-white safe look', values(0, 1, 7).join() === safe.join(), `${values(0, 1, 7).join()} (expected ${safe.join()})`);
     check('Failsafe: keeps refreshing the node while the app is away', Date.now() - packets[packets.length - 1].at < 200);
 
+    check('Failsafe: works even while another device is open but viewing',
+      /VIEWING ONLY|RECONNECTING|LIVE/.test(await second.textContent('header .status')));
+    await second.close();
     const page2 = await context.newPage();
     await page2.goto(`http://127.0.0.1:${HTTP_PORT}/`);
     await wait(2500);

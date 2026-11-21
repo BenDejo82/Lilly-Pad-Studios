@@ -537,7 +537,15 @@ async function testBuild(browser, file) {
     await click(page, '#strobe');
     await page.evaluate(() => { const r = document.getElementById('rate'); r.value = 15; r.dispatchEvent(new Event('input', { bubbles: true })); });
     await page.waitForTimeout(200);
-    check('DMX: strobe is capped at 10 Hz (DJXFLI ch 7 = 102)', (await ch(57, 13))[6] === 102, String((await ch(57, 13))[6]));
+    // v0.3.44: the top of the strobe slider is each fixture's fastest strobe; Max strobe limits it.
+    check('DMX: strobe slider top = the fixture\'s fastest (DJXFLI ch 7 = 255)', (await ch(57, 13))[6] === 255, String((await ch(57, 13))[6]));
+    await page.locator('[data-quick-group="pars"]').tap();
+    await click(page, '#strobe');
+    await page.evaluate(() => { const r = document.getElementById('rate'); r.value = 15; r.dispatchEvent(new Event('input', { bubbles: true })); });
+    await page.waitForTimeout(200);
+    check('DMX: OPPSK PAR strobe at the slider top uses its full range (ch 6 = 255)', (await ch(1, 7))[5] === 255, String((await ch(1, 7))[5]));
+    await click(page, '#strobe');
+    await page.locator('[data-quick-group="movers"]').tap();
     await click(page, '#strobe');
 
     await page.locator('#blackout').tap();
@@ -562,10 +570,17 @@ async function testBuild(browser, file) {
       (await page.evaluate(() => document.querySelectorAll('#dmxMonitor .dmx-row').length)) === 13);
     check('DMX monitor: PAR 1 shows its live red value',
       await page.evaluate(() => [...document.querySelectorAll('#dmxMonitor .dmx-row')][0].textContent.includes('255')));
+    await page.evaluate(() => { const m = document.getElementById('maxStrobe'); m.value = 50; m.dispatchEvent(new Event('input', { bubbles: true })); });
+    await click(page, '[data-quick-group="pars"]');
+    await click(page, '#strobe');
+    await page.waitForTimeout(200);
+    check('DMX: Max strobe at 50% halves the PAR\'s top strobe (ch 6 = 128)', (await ch(1, 7))[5] === 128, String((await ch(1, 7))[5]));
+    await click(page, '#strobe');
     await page.selectOption('#safeLookSelect', 'blackout');
     await page.locator('#lpsSaveShow').tap();
     await page.reload(); await page.waitForTimeout(800);
     check('DMX: the safe-look choice is saved with the show', (await page.evaluate(() => window.LPSDMX.safeLook())) === 'blackout');
+    check('DMX: the Max strobe setting is saved with the show', (await page.evaluate(() => window.LPSDMX.maxStrobe())) === 50);
     check('DMX: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
     await context.close();
   }

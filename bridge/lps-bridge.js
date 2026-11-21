@@ -10,6 +10,9 @@
  *   3. Failsafe: if the app goes quiet for 1 s (iPad asleep, Wi-Fi drop, app closed) the bridge
  *      fades over 3 s to the show's safe look (calm white by default) and holds it until the app
  *      returns, then fades back to the live show.
+ *   4. One device controls the lights at a time: the most recently connected copy of the app.
+ *      Other copies are "viewing only" until they tap Take control. Only the controlling device's
+ *      messages count, so the failsafe watches the device that is actually running the show.
  *
  * Plain Node.js (18 or newer), no extra packages. Runs on Windows, Mac, Linux and Raspberry Pi.
  * Settings: bridge-config.json next to this file (see bridge-config.example.json).
@@ -22,7 +25,7 @@ const dgram = require('dgram');
 const crypto = require('crypto');
 const os = require('os');
 
-const VERSION = '0.1.0';
+const VERSION = '0.2.0';
 const ROOT = path.resolve(__dirname, '..');
 const DEFAULTS = {
   nodeIp: '192.168.8.50',   // the Art-Net node
@@ -80,6 +83,7 @@ let safe = null;            // latest safe-look frame from the app
 let output = blank();       // what is being sent right now
 let lastMessage = 0;        // when the app last sent anything
 let sendEnabled = true;     // the app's "Send to lights" switch
+let controller = null;      // the one connection allowed to control the lights
 let mode = 'waiting';       // waiting | live | paused | fading-to-safe | safe | returning
 let fade = null;            // { from, to, start, seconds, next }
 
@@ -119,10 +123,12 @@ function step(now) {
 setInterval(() => step(Date.now()), Math.round(1000 / config.fps));
 
 // ───────────── Messages from the app ─────────────
-// Binary message: byte 0 = type (1 = live, 2 = safe look), byte 1 = flags (bit 0 = send to lights),
-// then 512 bytes for each LPS universe in order 1, 2.
-function onAppMessage(buf) {
-  if (buf.length !== 2 + 512 * lpsUniverses.length) return;
+// Binary message: byte 0 = type (1 = live, 2 = safe look, 3 = take control), byte 1 = flags
+// (bit 0 = send to lights), then 512 bytes for each LPS universe in order 1, 2.
+// Frames from a device that isn't in control are ignored.
+function onAppMessage(socket, buf) {
+  if (buf[0] === 3) { giveControl(socket); return; }
+  if (socket !== controller || buf.length !== 2 + 512 * lpsUniverses.length) return;
   const frame = Object.fromEntries(lpsUniverses.map((u, k) => [u, new Uint8Array(buf.subarray(2 + k * 512, 2 + (k + 1) * 512))]));
   lastMessage = Date.now();
   if (buf[0] === 1) { live = frame; sendEnabled = (buf[1] & 1) === 1; }
@@ -139,6 +145,7 @@ function wsHandshake(req, socket) {
   socket.setNoDelay(true);
   clients.add(socket);
   log(`App connected (${socket.remoteAddress}).`);
+  giveControl(socket); // the newest device takes control
   let pending = Buffer.alloc(0);
   socket.on('data', chunk => {
     pending = Buffer.concat([pending, chunk]);
@@ -153,12 +160,16 @@ function wsHandshake(req, socket) {
       const payload = Buffer.from(pending.subarray(maskEnd, maskEnd + len));
       if (masked) { const mask = pending.subarray(offset, maskEnd); for (let i = 0; i < len; i++) payload[i] ^= mask[i & 3]; }
       pending = pending.subarray(maskEnd + len);
-      if (opcode === 0x2) onAppMessage(payload);
+      if (opcode === 0x2) onAppMessage(socket, payload);
       else if (opcode === 0x9) wsSend(socket, payload, 0xA);     // ping -> pong
       else if (opcode === 0x8) { wsSend(socket, Buffer.alloc(0), 0x8); socket.end(); }
     }
   });
-  const gone = () => { if (clients.delete(socket)) log('App disconnected.'); };
+  const gone = () => {
+    if (!clients.delete(socket)) return;
+    log('App disconnected.');
+    if (socket === controller) { controller = null; log('The controlling device left: no device is in control.'); broadcastStatus(); }
+  };
   socket.on('close', gone);
   socket.on('error', gone);
 }
@@ -168,10 +179,19 @@ function wsSend(socket, data, opcode = 0x1) {
     : Buffer.from([0x80 | opcode, 126, body.length >> 8, body.length & 255]);
   try { socket.write(Buffer.concat([head, body])); } catch (e) { /* closing */ }
 }
-function status() {
-  return { lpsBridge: VERSION, node: config.nodeIp, universes: config.universes, mode, sendEnabled, clients: clients.size };
+function giveControl(socket) {
+  if (controller === socket) return;
+  controller = socket;
+  lastMessage = Date.now();
+  log(`Control: ${socket.remoteAddress} now controls the lights.`);
+  broadcastStatus();
 }
-setInterval(() => { const s = JSON.stringify(status()); for (const c of clients) wsSend(c, s); }, 1000);
+function status(socket) {
+  return { lpsBridge: VERSION, node: config.nodeIp, universes: config.universes, mode, sendEnabled,
+    clients: clients.size, inControl: socket ? socket === controller : undefined, hasController: !!controller };
+}
+function broadcastStatus() { for (const c of clients) wsSend(c, JSON.stringify(status(c))); }
+setInterval(broadcastStatus, 1000);
 
 // ───────────── Web server: the app and a status endpoint ─────────────
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
