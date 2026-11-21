@@ -1,2 +1,3 @@
-*.bat text eol=crlf
+# Windows launcher keeps Windows line endings in the repository itself (works in Download ZIP too).
+*.bat -text
 *.sh text eol=lf
