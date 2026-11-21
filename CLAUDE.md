@@ -55,6 +55,11 @@ the owner's fixture details and the development standards.
   Three.js r158 is stored in `<script id="lps-three-lib" type="text/plain">` and only run when
   3D is first opened. Its sizes (stage 7.3 × 4.9 m, truss 3 m) are defaults until the owner gives
   real measurements.
+- DMX output values come only from the DMX engine (`dmxFrame()` / `dmxSafeFrame()`, exposed read-only as
+  `window.LPSDMX`), using `fixtureProfiles`. It calls `appearance(f,i,now,{dmx:true})`, which skips the
+  on-screen strobe simulation and flash overlays; real strobing goes through each fixture's strobe channel,
+  capped at `DMX_LIMITS.strobeMaxHz`. Blackout = zeros except mover position/speed. The LPS Bridge must
+  fade to the safe look (`dmxSafeFrame`) if it loses contact with the app.
 - Before publishing, also run the code checker (ESLint, no-undef / no-unused-vars) and compare
   screenshots of every screen with the previous build when a change should not alter the look.
 

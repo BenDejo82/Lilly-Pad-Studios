@@ -510,6 +510,66 @@ async function testBuild(browser, file) {
     await context.close();
   }
 
+  // 18. DMX engine (v0.3.42): real channel values per the owner's manuals (docs/fixture-channels.md),
+  //     Blackout zeros, strobe within limits, the calm-white safe look, and the on-screen monitor.
+  {
+    const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
+    const ch = (addr, n, safe = false) => page.evaluate(([addr, n, safe]) =>
+      [...(safe ? window.LPSDMX.safeFrame() : window.LPSDMX.frame())[1].slice(addr - 1, addr - 1 + n)], [addr, n, safe]);
+    const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    const tapColour = async (group, colour) => {
+      await page.locator(`[data-quick-group="${group}"]`).tap();
+      await page.locator('#swatches .swatch', { hasText: colour }).tap();
+      await page.waitForTimeout(200);
+    };
+    await tapColour('pars', 'RED');
+    check('DMX: OPPSK PAR red = dimmer on ch 1, red on ch 2', same(await ch(1, 7), [204, 255, 0, 0, 0, 0, 0]), JSON.stringify(await ch(1, 7)));
+    await tapColour('betopper', 'WHITE');
+    check('DMX: LM30A white uses its white LEDs (ch 8 bar 1, ch 9 bar 2) and dimmer on ch 3',
+      same(await ch(98, 13), [0, 0, 204, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0]), JSON.stringify(await ch(98, 13)));
+    check('DMX: LF4808 white on ch 5, scaled by the dimmer (no master dimmer channel)',
+      same(await ch(83, 15), [0, 0, 0, 0, 204, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]), JSON.stringify(await ch(83, 15)));
+    const mover = await ch(57, 13);
+    check('DMX: DJXFLI pan/tilt centred (16-bit) with speed on ch 5 and dimmer on ch 6',
+      mover[0] === 128 && mover[2] === 128 && mover[4] === 20 && mover[5] === 204, JSON.stringify(mover));
+
+    await page.locator('[data-quick-group="movers"]').tap();
+    await click(page, '#strobe');
+    await page.evaluate(() => { const r = document.getElementById('rate'); r.value = 15; r.dispatchEvent(new Event('input', { bubbles: true })); });
+    await page.waitForTimeout(200);
+    check('DMX: strobe is capped at 10 Hz (DJXFLI ch 7 = 102)', (await ch(57, 13))[6] === 102, String((await ch(57, 13))[6]));
+    await click(page, '#strobe');
+
+    await page.locator('#blackout').tap();
+    await page.waitForTimeout(200);
+    const all = await page.evaluate(() => [...window.LPSDMX.frame()[1]]);
+    // Mover pan, tilt and pan/tilt speed (motor settings, not light) for MOVER 1 (057) and MOVER 2 (070).
+    const moverPositions = new Set([56, 58, 60, 69, 71, 73]);
+    check('DMX: Blackout sends zero on every channel except mover position and motor speed',
+      all.every((v, k) => v === 0 || moverPositions.has(k)), all.map((v, k) => v && !moverPositions.has(k) ? k + 1 : null).filter(Boolean).join(','));
+    await page.locator('#blackout').tap();
+
+    check('DMX: safe look = PAR soft white at 40%', same(await ch(1, 7, true), [102, 255, 255, 255, 0, 0, 0]), JSON.stringify(await ch(1, 7, true)));
+    check('DMX: safe look = mover low white, parked at centre, no strobe',
+      same(await ch(57, 13, true), [128, 0, 128, 0, 20, 64, 0, 0, 0, 0, 255, 0, 0]), JSON.stringify(await ch(57, 13, true)));
+    check('DMX: safe look keeps the LF4808 strobe panel off', (await ch(83, 15, true)).every(v => v === 0));
+
+    await click(page, '#lpsWorkspaceToggle');
+    await click(page, '.tabs [data-tab="patch"]');
+    await page.evaluate(() => document.querySelectorAll('#patch details').forEach(d => { d.open = true; }));
+    await page.waitForTimeout(400);
+    check('DMX monitor: lists all 13 fixtures on universe 1',
+      (await page.evaluate(() => document.querySelectorAll('#dmxMonitor .dmx-row').length)) === 13);
+    check('DMX monitor: PAR 1 shows its live red value',
+      await page.evaluate(() => [...document.querySelectorAll('#dmxMonitor .dmx-row')][0].textContent.includes('255')));
+    await page.selectOption('#safeLookSelect', 'blackout');
+    await page.locator('#lpsSaveShow').tap();
+    await page.reload(); await page.waitForTimeout(800);
+    check('DMX: the safe-look choice is saved with the show', (await page.evaluate(() => window.LPSDMX.safeLook())) === 'blackout');
+    check('DMX: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
+    await context.close();
+  }
+
   return results;
 }
 
