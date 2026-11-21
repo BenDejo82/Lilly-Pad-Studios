@@ -12,10 +12,10 @@ universes.
 | Router: GL.iNet travel router (Slate AX style, 2 × LAN + WAN) | 192.168.8.1 (settings page) | Automatic range (DHCP) 192.168.8.100–249 |
 | Behringer X32 Rack | **192.168.8.200** | Fixed; **reserved in the router** so it's never handed to another device |
 | Pknight CR011R Art-Net node | **192.168.8.50** | Fixed, set on the node's OLED menu; mask 255.255.255.0 |
-| LPS Bridge computer (planned) | 192.168.8.60 | Fixed, when the bridge exists |
+| LPS Bridge computer (owner's Windows PC) | **192.168.8.107** | **Reserved in the router**; open the app at `http://192.168.8.107:8080` |
 | iPad, phones, laptops | automatic (DHCP) | Router |
 
-Keep .50 and .60 outside the router's automatic (DHCP) range, or reserve them too.
+Keep .50 outside the router's automatic (DHCP) range; .107 and .200 are reserved in the router.
 
 **Ports:** gear goes in **LAN1 / LAN2** (e.g. LAN1 = X32 Rack, LAN2 = Art-Net node). **WAN** is only for an
 internet uplink; anything plugged in there is not on the show network. For more wired devices (e.g. a
@@ -53,3 +53,10 @@ Tips learned:
 - Windows may switch back to a Wi-Fi network with internet; untick "Connect automatically" on the home
   Wi-Fi while working on the show network (or use a cable).
 - The OPPSK PAR needs channel 1 (master dimmer) up before its colour channels do anything.
+
+## Bridge behaviour on the rig (tested)
+
+- One controlling device at a time worked: the PC took control, the iPad showed Viewing only, and
+  Take control on the iPad got it back.
+- When the bridge window is closed, the **Pknight node holds the last values** (the lights stay on in
+  their last look).
