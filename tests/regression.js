@@ -112,8 +112,9 @@ async function testBuild(browser, file) {
         'Movement FX holds the Move FX panel': has('Movement FX', '#moveFxBox'),
         'Effect Library holds the effect parameters': has('Effect Library & Parameters', '#fxContextPanel'),
         'Effect Programming holds the designer status': has('Effect Programming', '#fxDesignerStatus'),
-        'Channel Controls holds the Master Dimmer': has('Channel Controls & Dimmer', '#dimmer'),
-        'Strobe & Shutter holds the strobe pattern': has('Strobe & Shutter', '.strobe-parameters'),
+        'Dimmer & Channels holds the Master Dimmer': has('Dimmer & Channels', '#dimmer'),
+        'Strobe holds the strobe settings': has('Strobe', '.strobe-parameters'),
+        'Effects (Live) holds the effects panel': has('Effects', '#lpsSimpleFx'),
       };
     });
     for (const [name, ok] of Object.entries(sections)) check(`Section: ${name}`, ok);
@@ -596,7 +597,7 @@ async function testBuild(browser, file) {
     seen = await samplePars();
     check('DMX: Colour blend mixes red and white as the chase moves', seen.some(([, r, g, b]) => r === 255 && g > 0 && g < 255 && g === b),
       [...new Set(seen.map(key))].slice(0, 6).join(' '));
-    check('Chase: Colour blend switch shows its state', /Colour blend: On/.test(await page.textContent('#lpsSimpleChaseColor [data-chase-blend]')));
+    check('Chase: Color blend switch shows its state', (await page.getAttribute('#lpsSimpleChaseColor [data-chase-blend]', 'aria-checked')) === 'true');
     await click(page, '#lpsSimpleChaseColor [data-chase-blend]');
     await click(page, '[data-fx="static"]');
 
@@ -634,6 +635,46 @@ async function testBuild(browser, file) {
     check('DMX: the safe-look choice is saved with the show', (await page.evaluate(() => window.LPSDMX.safeLook())) === 'blackout');
     check('DMX: the Max strobe setting is saved with the show', (await page.evaluate(() => window.LPSDMX.maxStrobe())) === 50);
     check('DMX: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
+    await context.close();
+  }
+
+  // 19. Clean workflow UI (v0.3.47): switches, one name per action, fewer screens, less clutter.
+  {
+    const { context, page, errors } = await newPage(browser, file, 'iPad landscape');
+    const sw = id => page.evaluate(id => { const b = document.getElementById(id); return b && { role: b.getAttribute('role'), checked: b.getAttribute('aria-checked'), label: b.textContent.trim() }; }, id);
+    const before = await sw('beamGuides');
+    await page.locator('#beamGuides').tap();
+    const after = await sw('beamGuides');
+    check('UI: on/off settings are switches that flip and keep their name',
+      before.role === 'switch' && before.label === 'Beam guides' && after.label === 'Beam guides' && before.checked !== after.checked, JSON.stringify([before, after]));
+    await page.locator('#beamGuides').tap();
+    check('UI: Strobe, Multi-select and Snap are switches too',
+      (await Promise.all(['strobe', 'multiSelect', 'stageSnap'].map(sw))).every(x => x && x.role === 'switch'));
+    check('UI: effect sliders hidden while Static, shown for an effect',
+      await page.isHidden('#lpsQuickSpeed') && await (async () => { await click(page, '[data-simple-fx="pulse"]'); await page.waitForTimeout(100); return page.isVisible('#lpsQuickSpeed'); })());
+    await click(page, '[data-simple-fx="static"]');
+
+    await page.locator('#lpsSTC').tap();
+    await page.locator('#swatches .swatch', { hasText: 'BLUE' }).tap();
+    await page.locator('#lpsSTC').tap();
+    const look = async () => { await page.waitForTimeout(200); return page.evaluate(() => document.querySelector('.fixture .beam-guide').getAttribute('fill')); };
+    await page.locator('#lpsGo').tap(); const g1 = await look();
+    await page.locator('#lpsGo').tap(); const g2 = await look();
+    check('UI: GO in the top bar steps through cues from any screen', g1 !== g2, `${g1} → ${g2}`);
+    await page.locator('#lpsBack').tap();
+    check('UI: Back in the top bar steps back', (await look()) === g1);
+
+    await click(page, '#lpsWorkspaceToggle');
+    check('UI: the Effects panel is on the Pro LIVE tab too', await page.isVisible('#lpsSimpleFx'));
+    check('UI: Strobe pattern, width and offset sit in a closed "Strobe options" fold-out',
+      await page.evaluate(() => { const d = document.getElementById('strobeMode').closest('details.lps-more'); return !!d && !d.open && d.querySelector('summary').textContent === 'Strobe options'; })
+        && await page.isVisible('#rate'));
+    const labels = await page.evaluate(() => [...document.querySelectorAll('button')].map(b => b.textContent.trim()));
+    check('UI: one name per action (no leftover old names)',
+      !labels.some(t => /Capture cue|Overwrite active cue|Reset selected FX|Clear selected Flash FX|Stop selected|STC|Virtual rate|Colour/.test(t)), labels.filter(t => /Capture|Overwrite|Reset selected|Clear selected|Stop selected|STC|Colour/.test(t)).join(' | '));
+    await click(page, '.tabs [data-tab="fx"]');
+    check('UI: the redundant Apply FX button is gone', await page.isHidden('#fxApply'));
+    check('UI: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
     await context.close();
   }
 

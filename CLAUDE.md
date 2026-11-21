@@ -64,6 +64,10 @@ the owner's fixture details and the development standards.
   flashed through the dimmer (up to 10/s, limited by `maxStrobe`). Reduce Motion only affects the screen. Blackout = zeros except mover position/speed. The LPS Bridge must
   fade to the safe look (`dmxSafeFrame`) if it loses contact with the app. Only one connected device controls
   the lights at a time (the newest; others are viewing only until they tap Take control).
+- UI: an on/off **setting** is a switch (its button text "Name: On/Off" is drawn as a switch by the v0.3.47
+  UI layer; list it in `SWITCHES`); an **action** is a button. One name per action everywhere: Save Cue,
+  Update Cue, GO, Back, Stop FX, Stop Move FX, Stop Flash FX, Strobe speed, "Color" (US spelling). Tab
+  headings match tab names. Show settings only when they apply; tuck rarely used ones into a fold-out.
 - Before publishing, also run the code checker (ESLint, no-undef / no-unused-vars) and compare
   screenshots of every screen with the previous build when a change should not alter the look.
 
