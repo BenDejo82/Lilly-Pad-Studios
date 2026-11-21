@@ -19,6 +19,8 @@ the owner's fixture details and the development standards.
   plus the last build verified on the iPad; move older ones to `preview/archive/`.
 - `preview/archive/`: older test builds, kept for reference. Don't build on these.
 - `tests/regression.js`: browser tests for core features.
+- `bridge/`: the LPS Bridge (Node.js, no dependencies) that serves the app and sends Art-Net; tested end to
+  end by `node tests/bridge.test.js` (run it whenever the bridge or the DMX engine changes).
 
 ## How to make a change
 

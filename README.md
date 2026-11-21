@@ -21,6 +21,7 @@ cues, and preview them on a virtual stage.
 | `index.html` | The stable build |
 | `preview/` | Current test builds, newest version first to check |
 | `preview/archive/` | Older test builds |
+| `bridge/` | The LPS Bridge: sends the app's DMX to real lights over Art-Net ([how to use it](bridge/README.md)) |
 | `tests/regression.js` | Automatic browser tests: `node tests/regression.js <build.html>` |
 | `ROADMAP.md` | Goals, version history, plan and fixture research |
 | `CLAUDE.md` | Working notes for Claude |

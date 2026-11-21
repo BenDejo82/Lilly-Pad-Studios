@@ -1,0 +1,10 @@
+{
+  "nodeIp": "192.168.8.50",
+  "artnetPort": 6454,
+  "httpPort": 8080,
+  "universes": { "1": 0, "2": 1 },
+  "fps": 30,
+  "lostAfterMs": 1000,
+  "safeFadeSeconds": 3,
+  "returnFadeSeconds": 0.5
+}
