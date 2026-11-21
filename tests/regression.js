@@ -548,6 +548,37 @@ async function testBuild(browser, file) {
     await page.locator('[data-quick-group="movers"]').tap();
     await click(page, '#strobe');
 
+    // v0.3.45: strobe patterns, width and offset reach the real lights (LPS flashes the dimmer).
+    await page.locator('[data-quick-group="pars"]').tap();
+    await click(page, '#strobe');
+    await page.evaluate(() => { const m = document.getElementById('strobeMode'); m.value = 'random'; m.dispatchEvent(new Event('change', { bubbles: true })); m.dispatchEvent(new Event('input', { bubbles: true })); });
+    const dims = new Set(); let fixtureStrobe = 0;
+    for (let k = 0; k < 25; k++) { const v = await ch(1, 7); dims.add(v[0]); fixtureStrobe = Math.max(fixtureStrobe, v[5]); await page.waitForTimeout(40); }
+    check('DMX: Random strobe pattern flashes the PAR dimmer (fixture strobe channel off)', dims.size > 1 && dims.has(0) && fixtureStrobe === 0, [...dims].join(','));
+    await page.evaluate(() => { const m = document.getElementById('strobeMode'); m.value = 'regular'; m.dispatchEvent(new Event('change', { bubbles: true })); m.dispatchEvent(new Event('input', { bubbles: true })); });
+    await page.waitForTimeout(150);
+    check('DMX: Regular strobe at default width/offset uses the PAR\'s own strobe channel', (await ch(1, 7))[5] > 0, String((await ch(1, 7))[5]));
+    await click(page, '#strobe');
+
+    // v0.3.45: Flash FX reach the lights.
+    await click(page, '#whiteStrobe');
+    const flash = new Set();
+    for (let k = 0; k < 25; k++) { const v = await ch(1, 7); flash.add(v[0] + ':' + v.slice(1, 4).join('/')); await page.waitForTimeout(40); }
+    check('DMX: Flash FX white strobe flashes the PAR in white', [...flash].some(x => x.startsWith('255:255/255/255')) && flash.size > 1, [...flash].slice(0, 4).join(' '));
+    await click(page, '#whiteStrobe');
+
+    // v0.3.45: a White chase stays pure white, fades included (no fixture colour creeping back).
+    await page.evaluate(() => document.querySelector('#lpsSimpleChaseColor [data-chase-mode="white"]')?.click());
+    await click(page, '[data-fx="chase"]');
+    let pure = true, seen = 0;
+    for (let k = 0; k < 30; k++) {
+      const frame = await page.evaluate(() => [...window.LPSDMX.frame()[1].slice(0, 56)]);
+      for (let par = 0; par < 8; par++) { const [d, r, g, b] = frame.slice(par * 7, par * 7 + 4); if (d > 0) { seen++; if (!(r === g && g === b)) pure = false; } }
+      await page.waitForTimeout(40);
+    }
+    check('DMX: White chase stays pure white on the PARs, fades included', pure && seen > 0, `${seen} lit samples`);
+    await click(page, '[data-fx="static"]');
+
     await page.locator('#blackout').tap();
     await page.waitForTimeout(200);
     const all = await page.evaluate(() => [...window.LPSDMX.frame()[1]]);

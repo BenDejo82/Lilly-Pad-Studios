@@ -33,7 +33,8 @@ a Raspberry Pi in the rack) and:
      lights**; tap it again to return to the show.
 4. **Test the failsafe**: with the app live, lock the iPad (or close the browser tab). About a second
    later the lights fade over 3 seconds to the safe look; unlock and reopen to return to the show.
-5. To stop, close the bridge window. The node keeps its last values (see below).
+5. To stop, close the bridge window. The lights **fade to blackout** over 1.5 seconds first (setting:
+   `onClose`), so the rig never sits on a leftover look.
 
 On Mac, Linux or Raspberry Pi, run `start-lps-bridge.sh` instead (`sh start-lps-bridge.sh`).
 
@@ -51,13 +52,14 @@ Defaults suit the owner's rig (see `docs/network.md`). To change them, copy
 | `lostAfterMs` | `1000` | Silence before the failsafe starts |
 | `safeFadeSeconds` | `3` | Fade to the safe look |
 | `returnFadeSeconds` | `0.5` | Fade back to the live show |
+| `onClose` | `blackout` | When the bridge is closed: `blackout`, `safe` (the safe look) or `hold` |
+| `closeFadeSeconds` | `1.5` | Fade before the bridge exits |
 
 ## Good to know
 
 - The address opens the **newest preview build** in this folder. `http://<computer>:8080/stable` opens
   the stable `index.html`. Keep the folder up to date (download the ZIP again) to get new builds.
 - The bridge sends nothing until the app has connected once, so starting it never changes the lights.
-- If the **bridge itself** stops (window closed, computer off), it can't send the safe look; the node
-  then does whatever it does when Art-Net stops (most nodes hold the last values). Check this on the
-  Pknight before relying on it.
+- If the **bridge stops unexpectedly** (computer crash or power loss) it can't send anything, and the
+  Pknight node **holds the last values** (tested). That's why the calm-white failsafe matters during a show.
 - Tests: `node tests/bridge.test.js` runs the bridge against a simulated Art-Net node.

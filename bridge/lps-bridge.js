@@ -10,7 +10,9 @@
  *   3. Failsafe: if the app goes quiet for 1 s (iPad asleep, Wi-Fi drop, app closed) the bridge
  *      fades over 3 s to the show's safe look (calm white by default) and holds it until the app
  *      returns, then fades back to the live show.
- *   4. One device controls the lights at a time: the most recently connected copy of the app.
+ *   4. Closing the bridge on purpose (closing its window, Ctrl+C) fades the lights to blackout over
+ *      1.5 s before it exits, so the rig never sits on a leftover look. (Setting: onClose.)
+ *   5. One device controls the lights at a time: the most recently connected copy of the app.
  *      Other copies are "viewing only" until they tap Take control. Only the controlling device's
  *      messages count, so the failsafe watches the device that is actually running the show.
  *
@@ -25,7 +27,7 @@ const dgram = require('dgram');
 const crypto = require('crypto');
 const os = require('os');
 
-const VERSION = '0.2.0';
+const VERSION = '0.3.0';
 const ROOT = path.resolve(__dirname, '..');
 const DEFAULTS = {
   nodeIp: '192.168.8.50',   // the Art-Net node
@@ -36,6 +38,8 @@ const DEFAULTS = {
   lostAfterMs: 1000,        // silence before the failsafe starts
   safeFadeSeconds: 3,       // fade to the safe look
   returnFadeSeconds: 0.5,   // fade back to the live show
+  onClose: 'blackout',      // when the bridge is closed: 'blackout', 'safe' (safe look) or 'hold'
+  closeFadeSeconds: 1.5,    // fade before the bridge exits
 };
 
 function loadConfig() {
@@ -92,7 +96,7 @@ const mix = (a, b, t) => Object.fromEntries(lpsUniverses.map(u =>
 const copy = f => Object.fromEntries(lpsUniverses.map(u => [u, Uint8Array.from(f[u])]));
 
 function step(now) {
-  if (!live) return; // nothing sent until the app has connected at least once
+  if (!live || closing) return; // nothing sent until the app has connected at least once
   const quiet = now - lastMessage > config.lostAfterMs;
   if (quiet && !['fading-to-safe', 'safe'].includes(mode)) {
     mode = 'fading-to-safe';
@@ -220,6 +224,26 @@ server.on('upgrade', (req, socket) => {
   if (new URL(req.url, 'http://localhost').pathname === '/bridge') wsHandshake(req, socket);
   else socket.destroy();
 });
+
+// ───────────── Closing the bridge ─────────────
+// Closing the window or pressing Ctrl+C fades to the onClose look, then exits. (On Windows, closing
+// the console window arrives as SIGHUP and allows a few seconds, enough for the fade.)
+let closing = false;
+function shutdown(reason) {
+  if (closing) return;
+  closing = true;
+  const target = config.onClose === 'safe' ? (safe || blank()) : config.onClose === 'hold' ? null : blank();
+  if (!live || !target) { log(`Bridge closing (${reason}); lights left as they are.`); return process.exit(0); }
+  log(`Bridge closing (${reason}): fading to ${config.onClose} over ${config.closeFadeSeconds} s.`);
+  const from = copy(output), start = Date.now();
+  const timer = setInterval(() => {
+    const t = Math.min(1, (Date.now() - start) / 1000 / config.closeFadeSeconds);
+    output = mix(from, target, t);
+    for (const u of lpsUniverses) udp.send(artDmx(config.universes[u], output[u]), config.artnetPort, config.nodeIp);
+    if (t >= 1) { clearInterval(timer); setTimeout(() => process.exit(0), 150); }
+  }, Math.round(1000 / config.fps));
+}
+for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) process.on(signal, () => shutdown(signal));
 
 function log(message) { console.log(`[${new Date().toLocaleTimeString()}] ${message}`); }
 server.listen(config.httpPort, () => {

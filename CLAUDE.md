@@ -59,8 +59,9 @@ the owner's fixture details and the development standards.
   real measurements.
 - DMX output values come only from the DMX engine (`dmxFrame()` / `dmxSafeFrame()`, exposed read-only as
   `window.LPSDMX`), using `fixtureProfiles`. It calls `appearance(f,i,now,{dmx:true})`, which skips the
-  on-screen strobe simulation and flash overlays; real strobing goes through each fixture's strobe channel,
-  spread across that fixture's full range and limited by the show's `maxStrobe` setting (default 100%). Blackout = zeros except mover position/speed. The LPS Bridge must
+  slowed on-screen strobe simulation. Regular strobe at the default width/offset uses each fixture's own
+  strobe channel (full range, limited by `maxStrobe`); other patterns, widths and offsets, and Flash FX, are
+  flashed through the dimmer (up to 10/s, limited by `maxStrobe`). Reduce Motion only affects the screen. Blackout = zeros except mover position/speed. The LPS Bridge must
   fade to the safe look (`dmxSafeFrame`) if it loses contact with the app. Only one connected device controls
   the lights at a time (the newest; others are viewing only until they tap Take control).
 - Before publishing, also run the code checker (ESLint, no-undef / no-unused-vars) and compare

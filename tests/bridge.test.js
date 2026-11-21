@@ -133,6 +133,15 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     check('Failsafe: when the app returns, the bridge follows the app again',
       JSON.stringify(values(0, 1, 512)) === JSON.stringify(reopened), values(0, 1, 7).join());
     check('App: no errors', errors.length === 0, errors.slice(0, 2).join(' / '));
+
+    // v0.3.0 bridge: closing the bridge on purpose fades the lights to blackout, then exits.
+    const before = values(0, 1, 7);
+    const exited = new Promise(r => bridge.once('exit', () => r(true)));
+    bridge.kill('SIGINT');
+    const gone = await Promise.race([exited, wait(4000).then(() => false)]);
+    check('Closing the bridge: it exits within a few seconds', gone);
+    check('Closing the bridge: the lights fade to blackout first', before.some(v => v > 0) && values(0, 1, 512).every(v => v === 0),
+      `before ${before.join()} · after ${values(0, 1, 7).join()}`);
     await context.close();
   } catch (e) {
     check('Test run', false, e.message.split('\n')[0]);
