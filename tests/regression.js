@@ -567,16 +567,37 @@ async function testBuild(browser, file) {
     check('DMX: Flash FX white strobe flashes the PAR in white', [...flash].some(x => x.startsWith('255:255/255/255')) && flash.size > 1, [...flash].slice(0, 4).join(' '));
     await click(page, '#whiteStrobe');
 
-    // v0.3.45: a White chase stays pure white, fades included (no fixture colour creeping back).
-    await page.evaluate(() => document.querySelector('#lpsSimpleChaseColor [data-chase-mode="white"]')?.click());
+    // v0.3.46: chase colours. Fixture Color chases against off; White steps across the fixtures in
+    // their own colour (red here), crisp by default; Colour blend mixes the two.
+    const samplePars = async () => {
+      const seen = [];
+      for (let k = 0; k < 30; k++) {
+        const frame = await page.evaluate(() => [...window.LPSDMX.frame()[1].slice(0, 56)]);
+        for (let par = 0; par < 8; par++) seen.push(frame.slice(par * 7, par * 7 + 4));
+        await page.waitForTimeout(40);
+      }
+      return seen;
+    };
+    await page.locator('#swatches .swatch', { hasText: 'RED' }).tap(); // PARs are still selected
+    await page.evaluate(() => document.querySelector('#lpsSimpleChaseColor [data-chase-mode="fixture"]')?.click());
     await click(page, '[data-fx="chase"]');
-    let pure = true, seen = 0;
-    for (let k = 0; k < 30; k++) {
-      const frame = await page.evaluate(() => [...window.LPSDMX.frame()[1].slice(0, 56)]);
-      for (let par = 0; par < 8; par++) { const [d, r, g, b] = frame.slice(par * 7, par * 7 + 4); if (d > 0) { seen++; if (!(r === g && g === b)) pure = false; } }
-      await page.waitForTimeout(40);
-    }
-    check('DMX: White chase stays pure white on the PARs, fades included', pure && seen > 0, `${seen} lit samples`);
+    let seen = await samplePars();
+    check('DMX: Fixture Color chase runs the PARs\' own red against off', seen.some(([d]) => d === 0) && seen.some(([d, r, g, b]) => d > 0 && r === 255 && g === 0 && b === 0));
+    await page.evaluate(() => document.querySelector('#lpsSimpleChaseColor [data-chase-mode="white"]')?.click());
+    await page.waitForTimeout(150);
+    seen = await samplePars();
+    const key = ([, r, g, b]) => `${r}/${g}/${b}`;
+    check('DMX: White chase steps across the PARs while they stay on in red (crisp, no blend)',
+      seen.every(([d]) => d > 0) && seen.every(x => ['255/0/0', '255/255/255'].includes(key(x)))
+        && seen.some(x => key(x) === '255/0/0') && seen.some(x => key(x) === '255/255/255'),
+      [...new Set(seen.map(key))].join(' '));
+    await click(page, '#lpsSimpleChaseColor [data-chase-blend]');
+    await page.waitForTimeout(150);
+    seen = await samplePars();
+    check('DMX: Colour blend mixes red and white as the chase moves', seen.some(([, r, g, b]) => r === 255 && g > 0 && g < 255 && g === b),
+      [...new Set(seen.map(key))].slice(0, 6).join(' '));
+    check('Chase: Colour blend switch shows its state', /Colour blend: On/.test(await page.textContent('#lpsSimpleChaseColor [data-chase-blend]')));
+    await click(page, '#lpsSimpleChaseColor [data-chase-blend]');
     await click(page, '[data-fx="static"]');
 
     await page.locator('#blackout').tap();
