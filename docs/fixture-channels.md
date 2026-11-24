@@ -179,7 +179,7 @@ controllable colour sections and 8 white sections**.
 
 ## KeoBin lasers (QLC+ only for now; not in Lilly Pad Studios yet)
 
-From the owner's manuals, May need checking on the units. QLC+ definitions: `docs/qlcplus/KeoBin-*.qxf`.
+From the owner's manuals; may need checking on the units. QLC+ definitions: `docs/qlcplus/KeoBin-*.qxf`.
 Planned addresses (universe 1): **L2600 124** (room kept to 157 for its 34-channel mode) ·
 **L2800 158–175** · **LA500 176–191**. Laser class and mW output still to be read from the labels.
 
