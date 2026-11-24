@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FixtureDefinition>
+<FixtureDefinition xmlns="http://www.qlcplus.org/FixtureDefinition">
+ <Creator>
+  <Name>Q Light Controller Plus</Name>
+  <Version>4.12.7</Version>
+  <Author>Lilly Pad Studios (from the owner's manuals)</Author>
+ </Creator>
+ <Manufacturer>KeoBin</Manufacturer>
+ <Model>L2800</Model>
+ <Type>Laser</Type>
+ <Channel Name="Mode">
+  <Group Byte="0">Maintenance</Group>
+  <Capability Min="0" Max="5">DMX control</Capability>
+  <Capability Min="6" Max="50">Auto 1</Capability>
+  <Capability Min="51" Max="90">Auto 2</Capability>
+  <Capability Min="91" Max="140">Sound 1</Capability>
+  <Capability Min="141" Max="190">Sound 2</Capability>
+  <Capability Min="191" Max="240">Sound 3</Capability>
+  <Capability Min="241" Max="255">Off</Capability>
+ </Channel>
+ <Channel Name="Red pattern laser">
+  <Group Byte="0">Intensity</Group>
+  <Colour>Red</Colour>
+  <Capability Min="0" Max="255">Dimming / output</Capability>
+ </Channel>
+ <Channel Name="Green pattern laser">
+  <Group Byte="0">Intensity</Group>
+  <Colour>Green</Colour>
+  <Capability Min="0" Max="255">Dimming / output</Capability>
+ </Channel>
+ <Channel Name="Red beam laser">
+  <Group Byte="0">Intensity</Group>
+  <Colour>Red</Colour>
+  <Capability Min="0" Max="255">Jitter / output</Capability>
+ </Channel>
+ <Channel Name="Blue beam laser">
+  <Group Byte="0">Intensity</Group>
+  <Colour>Blue</Colour>
+  <Capability Min="0" Max="255">Jitter / output</Capability>
+ </Channel>
+ <Channel Name="Pattern motor">
+  <Group Byte="0">Speed</Group>
+  <Capability Min="0" Max="255">Rotation speed</Capability>
+ </Channel>
+ <Channel Name="LED red" Preset="IntensityRed"/>
+ <Channel Name="LED green" Preset="IntensityGreen"/>
+ <Channel Name="LED blue" Preset="IntensityBlue"/>
+ <Channel Name="LED white / UV" Preset="IntensityWhite"/>
+ <Channel Name="LED strobe">
+  <Group Byte="0">Shutter</Group>
+  <Capability Min="0" Max="0" Preset="ShutterClose">Off</Capability>
+  <Capability Min="1" Max="4" Preset="ShutterOpen">Solid on</Capability>
+  <Capability Min="5" Max="255" Preset="StrobeSlowToFast">Strobe slow to fast</Capability>
+ </Channel>
+ <Channel Name="Laser pattern">
+  <Group Byte="0">Gobo</Group>
+  <Capability Min="0" Max="4">No pattern</Capability>
+  <Capability Min="5" Max="9">Pattern 1</Capability>
+  <Capability Min="10" Max="14">Pattern 2</Capability>
+  <Capability Min="15" Max="19">Pattern 3</Capability>
+  <Capability Min="20" Max="24">Pattern 4</Capability>
+  <Capability Min="25" Max="29">Pattern 5</Capability>
+  <Capability Min="30" Max="34">Pattern 6</Capability>
+  <Capability Min="35" Max="39">Pattern 7</Capability>
+  <Capability Min="40" Max="44">Pattern 8</Capability>
+  <Capability Min="45" Max="49">Pattern 9</Capability>
+  <Capability Min="50" Max="54">Pattern 10</Capability>
+  <Capability Min="55" Max="59">Pattern 11</Capability>
+  <Capability Min="60" Max="64">Pattern 12</Capability>
+  <Capability Min="65" Max="69">Pattern 13</Capability>
+  <Capability Min="70" Max="74">Pattern 14</Capability>
+  <Capability Min="75" Max="79">Pattern 15</Capability>
+  <Capability Min="80" Max="84">Pattern 16</Capability>
+  <Capability Min="85" Max="89">Pattern 17</Capability>
+  <Capability Min="90" Max="94">Pattern 18</Capability>
+  <Capability Min="95" Max="99">Pattern 19</Capability>
+  <Capability Min="100" Max="104">Pattern 20</Capability>
+  <Capability Min="105" Max="109">Pattern 21</Capability>
+  <Capability Min="110" Max="114">Pattern 22</Capability>
+  <Capability Min="115" Max="119">Pattern 23</Capability>
+  <Capability Min="120" Max="124">Pattern 24</Capability>
+  <Capability Min="125" Max="129">Pattern 25</Capability>
+  <Capability Min="130" Max="134">Pattern 26</Capability>
+  <Capability Min="135" Max="139">Pattern 27</Capability>
+  <Capability Min="140" Max="144">Pattern 28</Capability>
+  <Capability Min="145" Max="149">Pattern 29</Capability>
+  <Capability Min="150" Max="154">Pattern 30</Capability>
+  <Capability Min="155" Max="159">Pattern 31</Capability>
+  <Capability Min="160" Max="164">Pattern 32</Capability>
+  <Capability Min="165" Max="169">Pattern 33</Capability>
+  <Capability Min="170" Max="174">Pattern 34</Capability>
+  <Capability Min="175" Max="179">Pattern 35</Capability>
+  <Capability Min="180" Max="184">Pattern 36</Capability>
+  <Capability Min="185" Max="189">Pattern 37</Capability>
+  <Capability Min="190" Max="194">Pattern 38</Capability>
+  <Capability Min="195" Max="199">Pattern 39</Capability>
+  <Capability Min="200" Max="204">Pattern 40</Capability>
+  <Capability Min="205" Max="209">Pattern 41</Capability>
+  <Capability Min="210" Max="214">Pattern 42</Capability>
+  <Capability Min="215" Max="219">Pattern 43</Capability>
+  <Capability Min="220" Max="224">Pattern 44</Capability>
+  <Capability Min="225" Max="229">Pattern 45</Capability>
+  <Capability Min="230" Max="255">Point</Capability>
+ </Channel>
+ <Channel Name="Pan">
+  <Group Byte="0">Pan</Group>
+  <Capability Min="0" Max="199">Manual X position</Capability>
+  <Capability Min="200" Max="255">Auto left-right movement</Capability>
+ </Channel>
+ <Channel Name="Tilt">
+  <Group Byte="0">Tilt</Group>
+  <Capability Min="0" Max="199">Manual Y position</Capability>
+  <Capability Min="200" Max="255">Auto up-down movement</Capability>
+ </Channel>
+ <Channel Name="Fixed rotation">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="63">0°</Capability>
+  <Capability Min="64" Max="127">90°</Capability>
+  <Capability Min="128" Max="191">180°</Capability>
+  <Capability Min="192" Max="255">270°</Capability>
+ </Channel>
+ <Channel Name="Continuous rotation">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="9">Stop</Capability>
+  <Capability Min="10" Max="120">Clockwise, fast to slow</Capability>
+  <Capability Min="121" Max="134">Not listed in manual (probably no function)</Capability>
+  <Capability Min="135" Max="245">Counter-clockwise, slow to fast</Capability>
+  <Capability Min="246" Max="255">Not listed in manual (probably no function)</Capability>
+ </Channel>
+ <Channel Name="Flip">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="9">Stop</Capability>
+  <Capability Min="10" Max="120">Horizontal flip speed</Capability>
+  <Capability Min="121" Max="134">Not listed in manual (probably no function)</Capability>
+  <Capability Min="135" Max="245">Vertical flip speed</Capability>
+  <Capability Min="246" Max="255">Not listed in manual (probably no function)</Capability>
+ </Channel>
+ <Channel Name="Stretch / zoom">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Static size, big to small</Capability>
+  <Capability Min="128" Max="255">Dynamic scaling, slow to fast</Capability>
+ </Channel>
+ <Mode Name="18 Channel">
+  <Channel Number="0">Mode</Channel>
+  <Channel Number="1">Red pattern laser</Channel>
+  <Channel Number="2">Green pattern laser</Channel>
+  <Channel Number="3">Red beam laser</Channel>
+  <Channel Number="4">Blue beam laser</Channel>
+  <Channel Number="5">Pattern motor</Channel>
+  <Channel Number="6">LED red</Channel>
+  <Channel Number="7">LED green</Channel>
+  <Channel Number="8">LED blue</Channel>
+  <Channel Number="9">LED white / UV</Channel>
+  <Channel Number="10">LED strobe</Channel>
+  <Channel Number="11">Laser pattern</Channel>
+  <Channel Number="12">Pan</Channel>
+  <Channel Number="13">Tilt</Channel>
+  <Channel Number="14">Fixed rotation</Channel>
+  <Channel Number="15">Continuous rotation</Channel>
+  <Channel Number="16">Flip</Channel>
+  <Channel Number="17">Stretch / zoom</Channel>
+ </Mode>
+</FixtureDefinition>

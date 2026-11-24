@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FixtureDefinition>
+<FixtureDefinition xmlns="http://www.qlcplus.org/FixtureDefinition">
+ <Creator>
+  <Name>Q Light Controller Plus</Name>
+  <Version>4.12.7</Version>
+  <Author>Lilly Pad Studios (from the owner's manuals)</Author>
+ </Creator>
+ <Manufacturer>KeoBin</Manufacturer>
+ <Model>L2600</Model>
+ <Type>Laser</Type>
+ <Channel Name="Laser on/off">
+  <Group Byte="0">Intensity</Group>
+  <Capability Min="0" Max="0">Off</Capability>
+  <Capability Min="1" Max="255">On</Capability>
+ </Channel>
+ <Channel Name="Auto / sound program">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="31">Preset effects, auto</Capability>
+  <Capability Min="32" Max="63">Preset serial, auto</Capability>
+  <Capability Min="64" Max="95">Preset mixed, auto</Capability>
+  <Capability Min="96" Max="127">Saving the effects</Capability>
+  <Capability Min="128" Max="159">Preset effects, sound</Capability>
+  <Capability Min="160" Max="191">Preset serial, sound</Capability>
+  <Capability Min="192" Max="223">Preset mixed, sound</Capability>
+  <Capability Min="224" Max="255">Saving the effects</Capability>
+ </Channel>
+ <Channel Name="Pattern group">
+  <Group Byte="0">Gobo</Group>
+  <Capability Min="0" Max="15">Group 1</Capability>
+  <Capability Min="16" Max="31">Group 2</Capability>
+  <Capability Min="32" Max="47">Group 3</Capability>
+  <Capability Min="48" Max="63">Group 4</Capability>
+  <Capability Min="64" Max="79">Group 5</Capability>
+  <Capability Min="80" Max="95">Group 6</Capability>
+  <Capability Min="96" Max="111">Group 7</Capability>
+  <Capability Min="112" Max="127">Group 8</Capability>
+  <Capability Min="128" Max="143">Group 9</Capability>
+  <Capability Min="144" Max="159">Group 10</Capability>
+  <Capability Min="160" Max="175">Group 11</Capability>
+  <Capability Min="176" Max="191">Group 12</Capability>
+  <Capability Min="192" Max="223">Group 13-15 (manual unclear)</Capability>
+  <Capability Min="224" Max="255">Group 0</Capability>
+ </Channel>
+ <Channel Name="Pattern (theme)">
+  <Group Byte="0">Gobo</Group>
+  <Capability Min="0" Max="255">Each value is one pattern (ignored in mixed mode)</Capability>
+ </Channel>
+ <Channel Name="Color">
+  <Group Byte="0">Colour</Group>
+  <Capability Min="0" Max="31">Full color</Capability>
+  <Capability Min="32" Max="63">Red</Capability>
+  <Capability Min="64" Max="95">Yellow</Capability>
+  <Capability Min="96" Max="127">Green</Capability>
+  <Capability Min="128" Max="159">Cyan</Capability>
+  <Capability Min="160" Max="191">Blue</Capability>
+  <Capability Min="192" Max="223">Pink</Capability>
+  <Capability Min="224" Max="255">White</Capability>
+ </Channel>
+ <Channel Name="Speed">
+  <Group Byte="0">Speed</Group>
+  <Capability Min="0" Max="0">No movement</Capability>
+  <Capability Min="1" Max="255">Slow to fast</Capability>
+ </Channel>
+ <Channel Name="A on/off">
+  <Group Byte="0">Intensity</Group>
+  <Capability Min="0" Max="0">All off</Capability>
+  <Capability Min="1" Max="99">Auto</Capability>
+  <Capability Min="100" Max="199">Sound</Capability>
+  <Capability Min="200" Max="254">Saving (manual DMX? check on the unit)</Capability>
+  <Capability Min="255" Max="255">Pattern A off</Capability>
+ </Channel>
+ <Channel Name="A out of bounds / size">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="49">Out of bounds: crossing</Capability>
+  <Capability Min="50" Max="99">Out of bounds: reentry</Capability>
+  <Capability Min="100" Max="149">Out of bounds: blanking</Capability>
+  <Capability Min="150" Max="199">Pattern zoomed out, out of bounds blanking</Capability>
+  <Capability Min="200" Max="255">Saving</Capability>
+ </Channel>
+ <Channel Name="A group">
+  <Group Byte="0">Gobo</Group>
+  <Capability Min="0" Max="223">Group 1</Capability>
+  <Capability Min="224" Max="243">Not listed in manual (probably no function)</Capability>
+  <Capability Min="244" Max="255">Group 0</Capability>
+ </Channel>
+ <Channel Name="A pattern">
+  <Group Byte="0">Gobo</Group>
+  <Capability Min="0" Max="255">Each value is one pattern (over the count = last pattern)</Capability>
+ </Channel>
+ <Channel Name="A zoom">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Static pattern size</Capability>
+  <Capability Min="128" Max="159">Zoom out, slow to fast</Capability>
+  <Capability Min="160" Max="191">Zoom in, slow to fast</Capability>
+  <Capability Min="192" Max="223">Zoom in/out, slow to fast</Capability>
+  <Capability Min="224" Max="255">Zoom rotation, slow to fast</Capability>
+ </Channel>
+ <Channel Name="A rotation">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Static rotation</Capability>
+  <Capability Min="128" Max="159">Rotate 2 circles CW/CCW, slow to fast</Capability>
+  <Capability Min="160" Max="191">Rotate 1 circle CW/CCW, slow to fast</Capability>
+  <Capability Min="192" Max="223">Rotate clockwise, slow to fast</Capability>
+  <Capability Min="224" Max="255">Rotate counter-clockwise, slow to fast</Capability>
+ </Channel>
+ <Channel Name="A X move">
+  <Group Byte="0">Pan</Group>
+  <Capability Min="0" Max="127">Static X position</Capability>
+  <Capability Min="128" Max="159">Up wave, slow to fast</Capability>
+  <Capability Min="160" Max="191">Down wave, slow to fast</Capability>
+  <Capability Min="192" Max="223">Move left, slow to fast</Capability>
+  <Capability Min="224" Max="255">Move right, slow to fast</Capability>
+ </Channel>
+ <Channel Name="A Y move">
+  <Group Byte="0">Tilt</Group>
+  <Capability Min="0" Max="127">Static Y position</Capability>
+  <Capability Min="128" Max="159">Right wave, slow to fast</Capability>
+  <Capability Min="160" Max="191">Left wave, slow to fast</Capability>
+  <Capability Min="192" Max="223">Move down, slow to fast</Capability>
+  <Capability Min="224" Max="255">Move up, slow to fast</Capability>
+ </Channel>
+ <Channel Name="A X size">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Static size</Capability>
+  <Capability Min="128" Max="159">Up distortion, slow to fast</Capability>
+  <Capability Min="160" Max="191">Down distortion, slow to fast</Capability>
+  <Capability Min="192" Max="223">Zoom in/out</Capability>
+  <Capability Min="224" Max="255">Rotation zoom in/out, slow to fast</Capability>
+ </Channel>
+ <Channel Name="A Y size">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Static size</Capability>
+  <Capability Min="128" Max="159">Right distortion, slow to fast</Capability>
+  <Capability Min="160" Max="191">Left distortion, slow to fast</Capability>
+  <Capability Min="192" Max="223">Zoom in/out</Capability>
+  <Capability Min="224" Max="255">Rotation zoom in/out, slow to fast</Capability>
+ </Channel>
+ <Channel Name="A fixed color">
+  <Group Byte="0">Colour</Group>
+  <Capability Min="0" Max="0">Original color</Capability>
+  <Capability Min="1" Max="255">Color changes every n dots</Capability>
+ </Channel>
+ <Channel Name="A pattern color">
+  <Group Byte="0">Colour</Group>
+  <Capability Min="0" Max="7">Original color</Capability>
+  <Capability Min="8" Max="15">Red</Capability>
+  <Capability Min="16" Max="23">Yellow</Capability>
+  <Capability Min="24" Max="31">Green</Capability>
+  <Capability Min="32" Max="39">Cyan</Capability>
+  <Capability Min="40" Max="47">Blue</Capability>
+  <Capability Min="48" Max="55">Pink</Capability>
+  <Capability Min="56" Max="63">White</Capability>
+  <Capability Min="64" Max="95">Whole pattern RGB, slow to fast</Capability>
+  <Capability Min="96" Max="127">Whole pattern YCP, slow to fast</Capability>
+  <Capability Min="128" Max="159">Whole pattern RGBYCPW, slow to fast</Capability>
+  <Capability Min="160" Max="191">7 color RGBYCPW, slow to fast</Capability>
+  <Capability Min="192" Max="223">Sine chasing color change</Capability>
+  <Capability Min="224" Max="255">Cosine chasing color change</Capability>
+ </Channel>
+ <Channel Name="A dots">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="63">Original dots</Capability>
+  <Capability Min="64" Max="127">No dots, sweep line blanking</Capability>
+  <Capability Min="128" Max="159">No dots, sweep line no blanking</Capability>
+  <Capability Min="160" Max="255">Saving</Capability>
+ </Channel>
+ <Channel Name="A drawing amount">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="255">With drawing 0-127: drawing hold time; with 128-255: walking line count</Capability>
+ </Channel>
+ <Channel Name="A drawing">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="63">Sine manual drawing</Capability>
+  <Capability Min="64" Max="127">Cosine manual drawing</Capability>
+  <Capability Min="128" Max="159">Dynamic drawing A, slow to fast</Capability>
+  <Capability Min="160" Max="191">Dynamic drawing B, slow to fast</Capability>
+  <Capability Min="192" Max="223">Dynamic drawing C, slow to fast</Capability>
+  <Capability Min="224" Max="255">Dynamic drawing D, slow to fast</Capability>
+ </Channel>
+ <Channel Name="A twist">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="255">Higher = less twisting</Capability>
+ </Channel>
+ <Channel Name="A grating">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="19">Grating group 1</Capability>
+  <Capability Min="20" Max="39">Grating group 2</Capability>
+  <Capability Min="40" Max="59">Grating group 3</Capability>
+  <Capability Min="60" Max="79">Grating group 4</Capability>
+  <Capability Min="80" Max="99">Grating group 5</Capability>
+  <Capability Min="100" Max="119">Grating group 6</Capability>
+  <Capability Min="120" Max="139">Grating group 7</Capability>
+  <Capability Min="140" Max="159">Grating group 8</Capability>
+  <Capability Min="160" Max="179">Grating group 9</Capability>
+  <Capability Min="180" Max="199">Grating group 10</Capability>
+  <Capability Min="200" Max="219">Grating group 11</Capability>
+  <Capability Min="220" Max="239">Grating group 12</Capability>
+  <Capability Min="240" Max="255">Grating group 13</Capability>
+ </Channel>
+ <Channel Name="B on/off">
+  <Group Byte="0">Intensity</Group>
+  <Capability Min="0" Max="0">All off</Capability>
+  <Capability Min="1" Max="99">Auto</Capability>
+  <Capability Min="100" Max="199">Sound</Capability>
+  <Capability Min="200" Max="254">Saving (manual DMX? check on the unit)</Capability>
+  <Capability Min="255" Max="255">Group A off, group B on</Capability>
+ </Channel>
+ <Channel Name="B out of bounds / size">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="49">Out of bounds: crossing</Capability>
+  <Capability Min="50" Max="99">Out of bounds: reentry</Capability>
+  <Capability Min="100" Max="149">Out of bounds: blanking</Capability>
+  <Capability Min="150" Max="255">Saving</Capability>
+ </Channel>
+ <Channel Name="B pattern">
+  <Group Byte="0">Gobo</Group>
+  <Capability Min="0" Max="255">Each value is one pattern (over the count = last pattern)</Capability>
+ </Channel>
+ <Channel Name="B zoom">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Static pattern size</Capability>
+  <Capability Min="128" Max="159">Zoom out, slow to fast</Capability>
+  <Capability Min="160" Max="191">Zoom in, slow to fast</Capability>
+  <Capability Min="192" Max="223">Zoom in/out, slow to fast</Capability>
+  <Capability Min="224" Max="255">Zoom rotation, slow to fast</Capability>
+ </Channel>
+ <Channel Name="B rotation">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Static rotation</Capability>
+  <Capability Min="128" Max="159">Rotate 2 circles CW/CCW, slow to fast</Capability>
+  <Capability Min="160" Max="191">Rotate 1 circle CW/CCW, slow to fast</Capability>
+  <Capability Min="192" Max="223">Rotate clockwise, slow to fast</Capability>
+  <Capability Min="224" Max="255">Rotate counter-clockwise, slow to fast</Capability>
+ </Channel>
+ <Channel Name="B X move">
+  <Group Byte="0">Pan</Group>
+  <Capability Min="0" Max="127">Static X position</Capability>
+  <Capability Min="128" Max="159">Up wave, slow to fast</Capability>
+  <Capability Min="160" Max="191">Down wave, slow to fast</Capability>
+  <Capability Min="192" Max="223">Move left, slow to fast</Capability>
+  <Capability Min="224" Max="255">Move right, slow to fast</Capability>
+ </Channel>
+ <Channel Name="B Y move">
+  <Group Byte="0">Tilt</Group>
+  <Capability Min="0" Max="127">Static Y position</Capability>
+  <Capability Min="128" Max="159">Right wave, slow to fast</Capability>
+  <Capability Min="160" Max="191">Left wave, slow to fast</Capability>
+  <Capability Min="192" Max="223">Move down, slow to fast</Capability>
+  <Capability Min="224" Max="255">Move up, slow to fast</Capability>
+ </Channel>
+ <Channel Name="B X size">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Static size</Capability>
+  <Capability Min="128" Max="159">Up distortion, slow to fast</Capability>
+  <Capability Min="160" Max="191">Down distortion, slow to fast</Capability>
+  <Capability Min="192" Max="223">Zoom in/out</Capability>
+  <Capability Min="224" Max="255">Rotation zoom in/out, slow to fast</Capability>
+ </Channel>
+ <Channel Name="B Y size">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Static size</Capability>
+  <Capability Min="128" Max="159">Right distortion, slow to fast</Capability>
+  <Capability Min="160" Max="191">Left distortion, slow to fast</Capability>
+  <Capability Min="192" Max="223">Zoom in/out</Capability>
+  <Capability Min="224" Max="255">Rotation zoom in/out, slow to fast</Capability>
+ </Channel>
+ <Channel Name="B fixed color">
+  <Group Byte="0">Colour</Group>
+  <Capability Min="0" Max="0">Original color</Capability>
+  <Capability Min="1" Max="255">Color changes every n dots</Capability>
+ </Channel>
+ <Channel Name="B pattern color">
+  <Group Byte="0">Colour</Group>
+  <Capability Min="0" Max="7">Original color</Capability>
+  <Capability Min="8" Max="15">Red</Capability>
+  <Capability Min="16" Max="23">Yellow</Capability>
+  <Capability Min="24" Max="31">Green</Capability>
+  <Capability Min="32" Max="39">Cyan</Capability>
+  <Capability Min="40" Max="47">Blue</Capability>
+  <Capability Min="48" Max="55">Pink</Capability>
+  <Capability Min="56" Max="63">White</Capability>
+  <Capability Min="64" Max="95">Whole pattern RGB, slow to fast</Capability>
+  <Capability Min="96" Max="127">Whole pattern YCP, slow to fast</Capability>
+  <Capability Min="128" Max="159">Whole pattern RGBYCPW, slow to fast</Capability>
+  <Capability Min="160" Max="191">7 color RGBYCPW, slow to fast</Capability>
+  <Capability Min="192" Max="223">Sine chasing color change</Capability>
+  <Capability Min="224" Max="255">Cosine chasing color change</Capability>
+ </Channel>
+ <Channel Name="B dots">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="63">Original dots</Capability>
+  <Capability Min="64" Max="127">No dots, sweep line blanking</Capability>
+  <Capability Min="128" Max="159">No dots, sweep line no blanking</Capability>
+  <Capability Min="160" Max="255">Saving</Capability>
+ </Channel>
+ <Channel Name="B drawing amount">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="255">With drawing 0-127: drawing hold time; with 128-255: walking line count</Capability>
+ </Channel>
+ <Channel Name="B drawing">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="63">Sine manual drawing</Capability>
+  <Capability Min="64" Max="127">Cosine manual drawing</Capability>
+  <Capability Min="128" Max="159">Dynamic drawing A, slow to fast</Capability>
+  <Capability Min="160" Max="191">Dynamic drawing B, slow to fast</Capability>
+  <Capability Min="192" Max="223">Dynamic drawing C, slow to fast</Capability>
+  <Capability Min="224" Max="255">Dynamic drawing D, slow to fast</Capability>
+ </Channel>
+ <Channel Name="B twist">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="255">Higher = less twisting</Capability>
+ </Channel>
+ <Channel Name="B grating">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="19">Grating group 1</Capability>
+  <Capability Min="20" Max="39">Grating group 2</Capability>
+  <Capability Min="40" Max="59">Grating group 3</Capability>
+  <Capability Min="60" Max="79">Grating group 4</Capability>
+  <Capability Min="80" Max="99">Grating group 5</Capability>
+  <Capability Min="100" Max="119">Grating group 6</Capability>
+  <Capability Min="120" Max="139">Grating group 7</Capability>
+  <Capability Min="140" Max="159">Grating group 8</Capability>
+  <Capability Min="160" Max="179">Grating group 9</Capability>
+  <Capability Min="180" Max="199">Grating group 10</Capability>
+  <Capability Min="200" Max="219">Grating group 11</Capability>
+  <Capability Min="220" Max="239">Grating group 12</Capability>
+  <Capability Min="240" Max="255">Grating group 13</Capability>
+ </Channel>
+ <Channel Name="No function">
+  <Group Byte="0">Nothing</Group>
+  <Capability Min="0" Max="255">No function</Capability>
+ </Channel>
+ <Mode Name="6 Channel">
+  <Channel Number="0">Laser on/off</Channel>
+  <Channel Number="1">Auto / sound program</Channel>
+  <Channel Number="2">Pattern group</Channel>
+  <Channel Number="3">Pattern (theme)</Channel>
+  <Channel Number="4">Color</Channel>
+  <Channel Number="5">Speed</Channel>
+ </Mode>
+ <Mode Name="34 Channel">
+  <Channel Number="0">A on/off</Channel>
+  <Channel Number="1">A out of bounds / size</Channel>
+  <Channel Number="2">A group</Channel>
+  <Channel Number="3">A pattern</Channel>
+  <Channel Number="4">A zoom</Channel>
+  <Channel Number="5">A rotation</Channel>
+  <Channel Number="6">A X move</Channel>
+  <Channel Number="7">A Y move</Channel>
+  <Channel Number="8">A X size</Channel>
+  <Channel Number="9">A Y size</Channel>
+  <Channel Number="10">A fixed color</Channel>
+  <Channel Number="11">A pattern color</Channel>
+  <Channel Number="12">A dots</Channel>
+  <Channel Number="13">A drawing amount</Channel>
+  <Channel Number="14">A drawing</Channel>
+  <Channel Number="15">A twist</Channel>
+  <Channel Number="16">A grating</Channel>
+  <Channel Number="17">B on/off</Channel>
+  <Channel Number="18">B out of bounds / size</Channel>
+  <Channel Number="19">No function</Channel>
+  <Channel Number="20">B pattern</Channel>
+  <Channel Number="21">B zoom</Channel>
+  <Channel Number="22">B rotation</Channel>
+  <Channel Number="23">B X move</Channel>
+  <Channel Number="24">B Y move</Channel>
+  <Channel Number="25">B X size</Channel>
+  <Channel Number="26">B Y size</Channel>
+  <Channel Number="27">B fixed color</Channel>
+  <Channel Number="28">B pattern color</Channel>
+  <Channel Number="29">B dots</Channel>
+  <Channel Number="30">B drawing amount</Channel>
+  <Channel Number="31">B drawing</Channel>
+  <Channel Number="32">B twist</Channel>
+  <Channel Number="33">B grating</Channel>
+ </Mode>
+</FixtureDefinition>

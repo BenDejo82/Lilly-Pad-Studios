@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FixtureDefinition>
+<FixtureDefinition xmlns="http://www.qlcplus.org/FixtureDefinition">
+ <Creator>
+  <Name>Q Light Controller Plus</Name>
+  <Version>4.12.7</Version>
+  <Author>Lilly Pad Studios (from the owner's manuals)</Author>
+ </Creator>
+ <Manufacturer>KeoBin</Manufacturer>
+ <Model>LA500</Model>
+ <Type>Laser</Type>
+ <Channel Name="Laser on/off">
+  <Group Byte="0">Intensity</Group>
+  <Capability Min="0" Max="0">Off (check on the unit)</Capability>
+  <Capability Min="1" Max="255">On (may work as a dimmer)</Capability>
+ </Channel>
+ <Channel Name="Strobe">
+  <Group Byte="0">Shutter</Group>
+  <Capability Min="0" Max="9" Preset="ShutterOpen">No strobe</Capability>
+  <Capability Min="10" Max="255" Preset="StrobeSlowToFast">Strobe slow to fast</Capability>
+ </Channel>
+ <Channel Name="Color">
+  <Group Byte="0">Colour</Group>
+  <Capability Min="0" Max="4">White (approx. range)</Capability>
+  <Capability Min="5" Max="9">Red (approx. range)</Capability>
+  <Capability Min="10" Max="14">Blue (approx. range)</Capability>
+  <Capability Min="15" Max="19">Purple (approx. range)</Capability>
+  <Capability Min="20" Max="24">Cyan (approx. range)</Capability>
+  <Capability Min="25" Max="29">Yellow (approx. range)</Capability>
+  <Capability Min="30" Max="34">Green (approx. range)</Capability>
+  <Capability Min="35" Max="39">Overall color cycle (rate on Color flow)</Capability>
+  <Capability Min="40" Max="44">Pattern initial color (rate on Color flow)</Capability>
+  <Capability Min="45" Max="46">Seven rainbow colors (rate on Color flow)</Capability>
+  <Capability Min="47" Max="214">Multi-segment color steps (2, 3, 4, 8, 16, 32 segments)</Capability>
+  <Capability Min="215" Max="255">Color segmentation and gradients</Capability>
+ </Channel>
+ <Channel Name="Color flow">
+  <Group Byte="0">Speed</Group>
+  <Capability Min="0" Max="9">Static</Capability>
+  <Capability Min="10" Max="127">Forward flow, slow to fast</Capability>
+  <Capability Min="128" Max="255">Reverse flow, slow to fast</Capability>
+ </Channel>
+ <Channel Name="Pattern">
+  <Group Byte="0">Gobo</Group>
+  <Capability Min="0" Max="255">Pattern within the chosen group</Capability>
+ </Channel>
+ <Channel Name="Pattern group">
+  <Group Byte="0">Gobo</Group>
+  <Capability Min="0" Max="49">Static geometric patterns (groups 1 and 2)</Capability>
+  <Capability Min="50" Max="74">Edge highlight patterns (group 3)</Capability>
+  <Capability Min="75" Max="99">Punched graphics (group 4)</Capability>
+  <Capability Min="100" Max="124">Not listed in manual (probably no function)</Capability>
+  <Capability Min="125" Max="174">Built-in animations (categories 1 and 2)</Capability>
+  <Capability Min="175" Max="224">Not listed in manual (probably no function)</Capability>
+  <Capability Min="225" Max="255">Custom patterns from the LightElf app</Capability>
+ </Channel>
+ <Channel Name="Size">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="255">Pattern size</Capability>
+ </Channel>
+ <Channel Name="Auto size">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="15">Static (uses Size)</Capability>
+  <Capability Min="16" Max="255">Auto zoom / loop scaling speeds</Capability>
+ </Channel>
+ <Channel Name="Rotation">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Manual angle</Capability>
+  <Capability Min="128" Max="191">Clockwise, slow to fast</Capability>
+  <Capability Min="192" Max="255">Counter-clockwise, slow to fast</Capability>
+ </Channel>
+ <Channel Name="X flip">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Horizontal flip position</Capability>
+  <Capability Min="128" Max="255">Horizontal flip speed</Capability>
+ </Channel>
+ <Channel Name="Y flip">
+  <Group Byte="0">Beam</Group>
+  <Capability Min="0" Max="127">Vertical flip position</Capability>
+  <Capability Min="128" Max="255">Vertical flip speed</Capability>
+ </Channel>
+ <Channel Name="Pan">
+  <Group Byte="0">Pan</Group>
+  <Capability Min="0" Max="255">Move pattern left / right</Capability>
+ </Channel>
+ <Channel Name="Tilt">
+  <Group Byte="0">Tilt</Group>
+  <Capability Min="0" Max="255">Move pattern up / down</Capability>
+ </Channel>
+ <Channel Name="X wave">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="1">No wave</Capability>
+  <Capability Min="2" Max="255">Wave amplitude and speed (8 steps)</Capability>
+ </Channel>
+ <Channel Name="Drawing">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="1">No function</Capability>
+  <Capability Min="2" Max="127">Manual progressive drawing</Capability>
+  <Capability Min="128" Max="255">Auto drawing (build up / erase)</Capability>
+ </Channel>
+ <Channel Name="Dynamic effects">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="1">No function</Capability>
+  <Capability Min="2" Max="202">Built-in dynamic effects</Capability>
+  <Capability Min="203" Max="234">Line, animation and landmark macros</Capability>
+  <Capability Min="235" Max="255">Random playback of all effects</Capability>
+ </Channel>
+ <Mode Name="16 Channel">
+  <Channel Number="0">Laser on/off</Channel>
+  <Channel Number="1">Strobe</Channel>
+  <Channel Number="2">Color</Channel>
+  <Channel Number="3">Color flow</Channel>
+  <Channel Number="4">Pattern</Channel>
+  <Channel Number="5">Pattern group</Channel>
+  <Channel Number="6">Size</Channel>
+  <Channel Number="7">Auto size</Channel>
+  <Channel Number="8">Rotation</Channel>
+  <Channel Number="9">X flip</Channel>
+  <Channel Number="10">Y flip</Channel>
+  <Channel Number="11">Pan</Channel>
+  <Channel Number="12">Tilt</Channel>
+  <Channel Number="13">X wave</Channel>
+  <Channel Number="14">Drawing</Channel>
+  <Channel Number="15">Dynamic effects</Channel>
+ </Mode>
+</FixtureDefinition>

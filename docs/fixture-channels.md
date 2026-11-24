@@ -176,3 +176,63 @@ pick which pattern) aren't listed yet.
 
 This tells us the panel's real layout for graphics and future pixel effects: **48 individually
 controllable colour sections and 8 white sections**.
+
+## KeoBin lasers (QLC+ only for now; not in Lilly Pad Studios yet)
+
+From the owner's manuals, May need checking on the units. QLC+ definitions: `docs/qlcplus/KeoBin-*.qxf`.
+Planned addresses (universe 1): **L2600 124** (room kept to 157 for its 34-channel mode) ·
+**L2800 158–175** · **LA500 176–191**. Laser class and mW output still to be read from the labels.
+
+**Off values:** L2600 ch 1 = 0 (34-channel mode: ch 1 and ch 18 = 0) · L2800 ch 1 = 241–255, or every
+laser and LED channel at 0 (**ch 1 = 0 is DMX control, not off**) · LA500 ch 1 = 0 (to confirm).
+
+### L2600 — 6-channel mode
+| Ch | Function | Values |
+|---|---|---|
+| 1 | Laser on/off | 0 off · 1–255 on |
+| 2 | Auto / sound program | 0–31 effects, 32–63 serial, 64–95 mixed (auto) · 96–127 saving · 128–223 the same, sound · 224–255 saving (manual says 224–225) |
+| 3 | Pattern group | 16 values per group from 0 · 224–255 group 0 (manual's numbering of the top groups is unclear) |
+| 4 | Pattern | each value one pattern |
+| 5 | Color | 32 values each: full color, red, yellow, green, cyan, blue, pink, white |
+| 6 | Speed | 0 still · 1–255 slow to fast |
+
+### L2600 — 34-channel mode (two layers, A = ch 1–17, B = ch 18–34)
+Ch 1 on/off and mode (0 off, 1–99 auto, 100–199 sound, 200–254 "saving", 255 pattern A off) · 2 out of
+bounds / size · 3 group (A only; ch 20 has no function) · 4 pattern · 5 zoom · 6 rotation · 7 X move ·
+8 Y move · 9 X size · 10 Y size · 11 fixed color · 12 pattern color (56–63 white; manual says 65–63) ·
+13 dots · 14 drawing amount · 15 drawing · 16 twist · 17 grating (13 groups of 20). Ch 18–34 repeat these
+for layer B (ch 18 255 = group A off, B on).
+
+### L2800 — 18-channel mode (pattern + beam lasers with RGBW/UV LEDs)
+| Ch | Function | Values |
+|---|---|---|
+| 1 | Mode | 0–5 DMX · 6–50 auto 1 · 51–90 auto 2 · 91–140 sound 1 · 141–190 sound 2 · 191–240 sound 3 · 241–255 off |
+| 2, 3 | Red, green pattern laser | 0–255 |
+| 4, 5 | Red, blue beam laser | 0–255 |
+| 6 | Pattern motor | rotation speed |
+| 7–10 | LED red, green, blue, white/UV | 0–255 |
+| 11 | LED strobe | 0 off · 1–4 solid · 5–255 slow to fast |
+| 12 | Laser pattern | 0–4 none · 5–229 patterns 1–45 (5 values each) · 230–255 point |
+| 13, 14 | Pan, tilt | 0–199 position · 200–255 auto movement |
+| 15 | Fixed rotation | 0°, 90°, 180°, 270° (64 values each) |
+| 16 | Continuous rotation | 0–9 stop · 10–120 CW fast to slow · 135–245 CCW slow to fast (121–134 not listed) |
+| 17 | Flip | 0–9 stop · 10–120 horizontal · 135–245 vertical |
+| 18 | Stretch / zoom | 0–127 static big to small · 128–255 dynamic |
+
+### LA500 — 16-channel mode (rear menu: Mode 0 DMX, 16CH)
+| Ch | Function | Values |
+|---|---|---|
+| 1 | Laser on/off | 0–255 (probably 0 off; check) |
+| 2 | Strobe | 0–9 none · 10–255 slow to fast |
+| 3 | Color | 0–34 fixed white, red, blue, purple, cyan, yellow, green (about 5 each) · 35–39 color cycle · 40–44 initial color · 45–46 rainbow · 47–214 segments · 215–255 gradients |
+| 4 | Color flow | 0–9 static · 10–127 forward · 128–255 reverse |
+| 5 | Pattern | within the group on ch 6 |
+| 6 | Pattern group | 0–49 geometric · 50–74 edge highlight · 75–99 punched · 125–174 animations · 225–255 LightElf custom (100–124, 175–224 not listed) |
+| 7 | Size | 0–255 |
+| 8 | Auto size | 0–15 static · 16–255 auto zoom |
+| 9 | Rotation | 0–127 angle · 128–191 CW · 192–255 CCW |
+| 10, 11 | X flip, Y flip | 0–127 position · 128–255 speed |
+| 12, 13 | Pan, tilt | 0–255 |
+| 14 | X wave | 0–1 none · 2–255 wave |
+| 15 | Drawing | 0–1 none · 2–127 manual · 128–255 auto |
+| 16 | Dynamic effects | 0–1 none · 2–202 effects · 203–234 macros · 235–255 random |
